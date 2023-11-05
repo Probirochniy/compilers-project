@@ -1,5 +1,5 @@
-#include "../../include/semantic/semantic.h"
-#include "../../include/parser/parser.h"
+#include "semantic.h"
+#include "parser.h"
 
 void Semantic::checkDeclar(AST::Node node)
 {

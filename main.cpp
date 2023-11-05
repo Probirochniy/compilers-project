@@ -1,6 +1,6 @@
-#include "include/lexer/lexer.h"
-#include "include/parser/parser.h"
-#include "include/semantic/semantic.h"
+#include "lexer.h"
+#include "parser.h"
+#include "semantic.h"
 
 int main(int argc, char **argv)
 {
