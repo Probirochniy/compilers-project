@@ -14,5 +14,4 @@ public:
     void checkDeclar(AST::Node node);
     AST::Node optimize(AST::Node node);
     void checkTypes(AST::Node node);
-    
 };

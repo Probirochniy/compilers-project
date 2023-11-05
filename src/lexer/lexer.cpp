@@ -2,7 +2,6 @@
 
 Token::Token() {}
 Token::Token(TokenType t, std::string v) : type(t), value(v) {}
-// Token::~Token() {}
 
 Lexer::Lexer() {}
 
@@ -25,7 +24,7 @@ Lexer::Lexer(std::string fileName)
 
 std::list<Token> Lexer::analyze()
 {
-    std::string operators = "+-*/,:=(){}[];.><!";
+    std::string operators = "+-*/,:=(){}[];.><!\'\"";
 
     for (int i = 0; i < src.length(); i++)
     {
@@ -137,10 +136,14 @@ std::list<Token> Lexer::analyze()
                     token += src[i];
                     t = TokenType::LESS;
                 }
-            }
-
-            else
-            {
+            } else if (src[i] == '\'' || src[i] == '\"'){
+                int j = i + 1;
+                while(j < src.size() && src[j] != src[i]) {
+                    token += src[i];
+                }
+                i = j - 1;
+                t = TokenType::STRING;
+            } else {
                 token += src[i];
                 t = getTokenType(src[i]);
             }
@@ -151,11 +154,11 @@ std::list<Token> Lexer::analyze()
 
         else if (isDigit(src[i]))
         {
-            TokenType ttype = TokenType::NUMBER;
+            TokenType ttype = TokenType::INTEGER;
             while (i < src.length() && (isDigit(src[i]) || src[i] == '.'))
             {
                 token += src[i];
-                i++;
+                i ++;
             }
 
             if (isRange(token))
@@ -166,6 +169,8 @@ std::list<Token> Lexer::analyze()
             else if (hasMoreThanOneDot(token))
             {
                 ttype = TokenType::UNKNOWNTYPE;
+            } else if (token.find('.') != std::string::npos) {
+                ttype = TokenType::REAL;
             }
 
             i--;
@@ -186,7 +191,6 @@ std::list<Token> Lexer::analyze()
             i--;
             continue;
         }
-
         else
         {
             token += src[i];
@@ -308,9 +312,6 @@ std::string Lexer::getTokenTypeName(TokenType tokenType)
 
     switch (tokenType)
     {
-    case TokenType::NUMBER:
-        typeName = "NUMBER";
-        break;
     case TokenType::IDENTIFIER:
         typeName = "IDENTIFIER";
         break;
@@ -400,6 +401,15 @@ std::string Lexer::getTokenTypeName(TokenType tokenType)
         break;
     case TokenType::EXCLAMATION:
         typeName = "EXCLAMATION";
+        break;
+    case TokenType::STRING:
+        typeName = "STRING";
+        break;
+    case TokenType::INTEGER:
+        typeName = "INTEGER";
+        break;
+    case TokenType::REAL:
+        typeName = "REAL";
         break;
     }
 

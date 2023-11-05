@@ -9,7 +9,8 @@
 
 enum class TokenType
 {
-    NUMBER,
+    INTEGER,
+    REAL,
     IDENTIFIER,
     COMMA,
     KEYWORD,
@@ -39,7 +40,8 @@ enum class TokenType
     LESS,
     MORE,
     EXCLAMATION,
-    FOLLOWING
+    FOLLOWING,
+    STRING
 };
 
 class Token
