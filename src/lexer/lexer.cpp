@@ -139,9 +139,11 @@ std::list<Token> Lexer::analyze()
             } else if (src[i] == '\'' || src[i] == '\"'){
                 int j = i + 1;
                 while(j < src.size() && src[j] != src[i]) {
-                    token += src[i];
+                    token += src[j];
+                    j ++;
                 }
-                i = j - 1;
+                token = src[i] + token + src[i];
+                i = j;
                 t = TokenType::STRING;
             } else {
                 token += src[i];

@@ -495,7 +495,7 @@ AST::Node Parser::parseAssignment()
 
             getCurToken();
 
-            if (curToken.type == TokenType::NUMBER || curToken.type == TokenType::IDENTIFIER)
+            if (curToken.type == TokenType::STRING || curToken.type == TokenType::REAL || curToken.type == TokenType::INTEGER || curToken.type == TokenType::IDENTIFIER)
             {
                 assignmentRight.children.push_back(parseExpr());
             }
@@ -556,10 +556,9 @@ AST::Node Parser::parseAssignment()
 
         curTokensList = right;
         Token firstToken = curTokensList.front();
-
         getCurToken();
 
-        if (firstToken.type == TokenType::NUMBER || firstToken.type == TokenType::IDENTIFIER)
+        if (firstToken.type == TokenType::STRING || firstToken.type == TokenType::REAL || firstToken.type == TokenType::INTEGER || firstToken.type == TokenType::IDENTIFIER)
         {
             assignmentRight.children.push_back(parseExpr());
         }
@@ -759,7 +758,7 @@ AST::Node Parser::getNode()
     }
 
     // Expression
-    if (tk.type == TokenType::NUMBER || tk.type == TokenType::IDENTIFIER || tk.type == TokenType::OPENBRACKET)
+    if (tk.type == TokenType::STRING || tk.type == TokenType::REAL || tk.type == TokenType::INTEGER || tk.type == TokenType::IDENTIFIER || tk.type == TokenType::OPENBRACKET)
     {
 
         if (tokens.front().type == TokenType::DEFINITION)
