@@ -5,7 +5,7 @@
 #include <string>
 #include <list>
 #include <regex>
-#include "keyword.h"
+#include "lexer/keyword.h"
 
 enum class TokenType
 {

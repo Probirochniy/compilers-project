@@ -1,4 +1,4 @@
-#include "../../include/lexer/lexer.h"
+#include "lexer.h"
 
 Token::Token() {}
 Token::Token(TokenType t, std::string v) : type(t), value(v) {}

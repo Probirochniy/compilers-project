@@ -1,4 +1,4 @@
-#include "../../include/parser/parser.h"
+#include "parser.h"
 
 AST::Node::Node()
 {

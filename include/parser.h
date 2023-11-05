@@ -1,5 +1,5 @@
 #pragma once
-#include "../lexer/lexer.h"
+#include "lexer.h"
 
 enum class NodeType
 {
