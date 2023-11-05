@@ -308,120 +308,120 @@ bool Lexer::isIdentifierOk(char c)
     return false;
 }
 
-std::string Lexer::getTokenTypeName(TokenType tokenType)
-{
-    std::string typeName;
+// std::string Lexer::getTokenTypeName(TokenType tokenType)
+// {
+//     std::string typeName;
 
-    switch (tokenType)
-    {
-    case TokenType::IDENTIFIER:
-        typeName = "IDENTIFIER";
-        break;
-    case TokenType::COMMA:
-        typeName = "COMMA";
-        break;
-    case TokenType::KEYWORD:
-        typeName = "KEYWORD";
-        break;
-    case TokenType::DELIMITER:
-        typeName = "DELIMITER";
-        break;
-    case TokenType::PLUS:
-        typeName = "PLUS";
-        break;
-    case TokenType::MINUS:
-        typeName = "MINUS";
-        break;
-    case TokenType::MULTIPLY:
-        typeName = "MULTIPLY";
-        break;
-    case TokenType::DIVIDE:
-        typeName = "DIVIDE";
-        break;
-    case TokenType::END_OF_FILE:
-        typeName = "END_OF_FILE";
-        break;
-    case TokenType::COMMENT:
-        typeName = "COMMENT";
-        break;
-    case TokenType::DEFINITION:
-        typeName = "DEFINITION";
-        break;
-    case TokenType::OPENBRACKET:
-        typeName = "OPENBRACKET";
-        break;
-    case TokenType::CLOSEBRACKET:
-        typeName = "CLOSEBRACKET";
-        break;
-    case TokenType::OPENSQUAREBRACKET:
-        typeName = "OPENSQUAREBRACKET";
-        break;
-    case TokenType::CLOSESQUAREBRACKET:
-        typeName = "CLOSESQUAREBRACKET";
-        break;
-    case TokenType::OPENFIGUREBRACKET:
-        typeName = "OPENFIGUREBRACKET";
-        break;
-    case TokenType::CLOSEFIGUREBRACKET:
-        typeName = "CLOSEFIGUREBRACKET";
-        break;
-    case TokenType::RANGE:
-        typeName = "RANGE";
-        break;
-    case TokenType::UNKNOWNTYPE:
-        typeName = "UNKNOWNTYPE";
-        break;
-    case TokenType::DOT:
-        typeName = "DOT";
-        break;
-    case TokenType::COLON:
-        typeName = "COLON";
-        break;
-    case TokenType::EQUAL:
-        typeName = "EQUAL";
-        break;
-    case TokenType::EQUALITY:
-        typeName = "EQUALITY";
-        break;
-    case TokenType::UNEQUALITY:
-        typeName = "UNEQUALITY";
-        break;
-    case TokenType::MORE:
-        typeName = "MORE";
-        break;
-    case TokenType::LESS:
-        typeName = "LESS";
-        break;
-    case TokenType::MOREOREQUAL:
-        typeName = "MOREOREQUAL";
-        break;
-    case TokenType::LESSOREQUAL:
-        typeName = "LESSOREQUAL";
-        break;
-    case TokenType::FOLLOWING:
-        typeName = "FOLLOWING";
-        break;
-    case TokenType::EXCLAMATION:
-        typeName = "EXCLAMATION";
-        break;
-    case TokenType::STRING:
-        typeName = "STRING";
-        break;
-    case TokenType::INTEGER:
-        typeName = "INTEGER";
-        break;
-    case TokenType::REAL:
-        typeName = "REAL";
-        break;
-    }
+//     switch (tokenType)
+//     {
+//     case TokenType::IDENTIFIER:
+//         typeName = "IDENTIFIER";
+//         break;
+//     case TokenType::COMMA:
+//         typeName = "COMMA";
+//         break;
+//     case TokenType::KEYWORD:
+//         typeName = "KEYWORD";
+//         break;
+//     case TokenType::DELIMITER:
+//         typeName = "DELIMITER";
+//         break;
+//     case TokenType::PLUS:
+//         typeName = "PLUS";
+//         break;
+//     case TokenType::MINUS:
+//         typeName = "MINUS";
+//         break;
+//     case TokenType::MULTIPLY:
+//         typeName = "MULTIPLY";
+//         break;
+//     case TokenType::DIVIDE:
+//         typeName = "DIVIDE";
+//         break;
+//     case TokenType::END_OF_FILE:
+//         typeName = "END_OF_FILE";
+//         break;
+//     case TokenType::COMMENT:
+//         typeName = "COMMENT";
+//         break;
+//     case TokenType::DEFINITION:
+//         typeName = "DEFINITION";
+//         break;
+//     case TokenType::OPENBRACKET:
+//         typeName = "OPENBRACKET";
+//         break;
+//     case TokenType::CLOSEBRACKET:
+//         typeName = "CLOSEBRACKET";
+//         break;
+//     case TokenType::OPENSQUAREBRACKET:
+//         typeName = "OPENSQUAREBRACKET";
+//         break;
+//     case TokenType::CLOSESQUAREBRACKET:
+//         typeName = "CLOSESQUAREBRACKET";
+//         break;
+//     case TokenType::OPENFIGUREBRACKET:
+//         typeName = "OPENFIGUREBRACKET";
+//         break;
+//     case TokenType::CLOSEFIGUREBRACKET:
+//         typeName = "CLOSEFIGUREBRACKET";
+//         break;
+//     case TokenType::RANGE:
+//         typeName = "RANGE";
+//         break;
+//     case TokenType::UNKNOWNTYPE:
+//         typeName = "UNKNOWNTYPE";
+//         break;
+//     case TokenType::DOT:
+//         typeName = "DOT";
+//         break;
+//     case TokenType::COLON:
+//         typeName = "COLON";
+//         break;
+//     case TokenType::EQUAL:
+//         typeName = "EQUAL";
+//         break;
+//     case TokenType::EQUALITY:
+//         typeName = "EQUALITY";
+//         break;
+//     case TokenType::UNEQUALITY:
+//         typeName = "UNEQUALITY";
+//         break;
+//     case TokenType::MORE:
+//         typeName = "MORE";
+//         break;
+//     case TokenType::LESS:
+//         typeName = "LESS";
+//         break;
+//     case TokenType::MOREOREQUAL:
+//         typeName = "MOREOREQUAL";
+//         break;
+//     case TokenType::LESSOREQUAL:
+//         typeName = "LESSOREQUAL";
+//         break;
+//     case TokenType::FOLLOWING:
+//         typeName = "FOLLOWING";
+//         break;
+//     case TokenType::EXCLAMATION:
+//         typeName = "EXCLAMATION";
+//         break;
+//     case TokenType::STRING:
+//         typeName = "STRING";
+//         break;
+//     case TokenType::INTEGER:
+//         typeName = "INTEGER";
+//         break;
+//     case TokenType::REAL:
+//         typeName = "REAL";
+//         break;
+//     }
 
-    return typeName;
-}
+//     return typeName;
+// }
 
-void Lexer::printTokens(std::list<Token> tokens)
-{
-    for (auto token : tokens)
-    {
-        std::cout << getTokenTypeName(token.type) << " |" << token.value << "|\n";
-    }
-}
+// void Lexer::printTokens(std::list<Token> tokens)
+// {
+//     for (auto token : tokens)
+//     {
+//         std::cout << getTokenTypeName(token.type) << " |" << token.value << "|\n";
+//     }
+// }

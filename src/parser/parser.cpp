@@ -186,7 +186,7 @@ AST::Node Parser::parseForLoop()
 
     if (left.size() != 3 || left[0].type != TokenType::IDENTIFIER || left[1].value != IN_KEYWORD || left[2].type != TokenType::RANGE)
     {
-        std::cout << getTokenTypeName(left[2].type);
+        // std::cout << getTokenTypeName(left[2].type);
         throw std::runtime_error("for condition is not correct!");
     }
 
@@ -859,8 +859,6 @@ AST::Node Parser::analyze()
 {
     tree.node.children = parseBody();
 
-    printAST(tree.node);
-
     return tree.node;
 }
 AST::Node Parser::makeTree(NodeType nodetype, Token value, std::list<AST::Node> children)
@@ -914,155 +912,3 @@ AST::Node Parser::parseFactor()
     }
     return res;
 }
-
-std::string Parser::getNodeTypeName(NodeType nodetype)
-{
-    std::string typeName;
-
-    switch (nodetype)
-    {
-    case NodeType::PROGRAM:
-        typeName = "PROGRAM";
-        break;
-
-    case NodeType::DECLARATION:
-        typeName = "DECLARATION";
-        break;
-
-    case NodeType::FACTOR:
-        typeName = "FACTOR";
-        break;
-
-    case NodeType::CONSTANT:
-        typeName = "CONSTANT";
-        break;
-
-    case NodeType::TERM:
-        typeName = "TERM";
-        break;
-
-    case NodeType::VARIABLE:
-        typeName = "VARIABLE";
-        break;
-
-    case NodeType::DECLARATION_LEFT:
-        typeName = "DECLARATION_LEFT";
-        break;
-
-    case NodeType::DECLARATION_RIGHT:
-        typeName = "DECLARATION_RIGHT";
-        break;
-
-    case NodeType::IF_BODY:
-        typeName = "IF_BODY";
-        break;
-
-    case NodeType::IF_COND:
-        typeName = "IF_COND";
-        break;
-
-    case NodeType::IF_STATEMENT:
-        typeName = "IF_STATEMENT";
-        break;
-
-    case NodeType::EXPRESSION:
-        typeName = "EXPRESSION";
-        break;
-
-    case NodeType::FUNCTION:
-        typeName = "FUNCTION";
-        break;
-
-    case NodeType::FUNCTION_BODY:
-        typeName = "FUNCTION_BODY";
-        break;
-
-    case NodeType::FUNCTION_VARIABLES:
-        typeName = "FUNCTION_VARIABLES";
-        break;
-
-    case NodeType::FORLOOP:
-        typeName = "FORLOOP";
-        break;
-
-    case NodeType::WHILELOOP:
-        typeName = "WHILELOOP";
-        break;
-
-    case NodeType::RANGE:
-        typeName = "RANGE";
-        break;
-
-    case NodeType::VARS_LIST:
-        typeName = "VARS_LIST";
-        break;
-
-    case NodeType::LIST:
-        typeName = "LIST";
-        break;
-
-    case NodeType::LIST_ELEMENT:
-        typeName = "LIST_ELEMENT";
-        break;
-
-    case NodeType::TUPLE:
-        typeName = "TUPLE";
-        break;
-
-    case NodeType::TUPLE_ELEMENT:
-        typeName = "TUPLE_ELEMENT";
-        break;
-
-    case NodeType::FORLOOP_BODY:
-        typeName = "FORLOOP_BODY";
-        break;
-
-    case NodeType::PRINT:
-        typeName = "PRINT";
-        break;
-
-    case NodeType::WHILELOOP_BODY:
-        typeName = "WHILELOOP_BODY";
-        break;
-
-    case NodeType::ELSE_BODY:
-        typeName = "ELSE_BODY";
-        break;
-
-    case NodeType::IDENTIFIER:
-        typeName = "IDENTIFIER";
-        break;
-    case NodeType::BODY:
-        typeName = "BODY";
-        break;
-    case NodeType::COMMENT:
-        typeName = "COMMENT";
-        break;
-    }
-    return typeName;
-}
-
-void Parser::printAST(AST::Node node, std::string tab)
-{
-    std::string TAB = "   ";
-    std::cout << tab << "{\n";
-    std::string t = tab;
-    tab += TAB;
-    std::cout << tab << "\"Token\": {\"type\": \"" << Lexer::getTokenTypeName(node.value.type) << "\", \"value\": \"" << node.value.value << "\"}," << '\n';
-    std::cout << tab << "\"Type\": \"" << getNodeTypeName(node.type) << "\",\n";
-    if (node.children.empty())
-    {
-        std::cout << tab << "\"children\": []\n";
-    }
-    else
-    {
-        std::cout << tab << "\"children\": [\n";
-        for (auto n : node.children)
-        {
-            printAST(n, tab + TAB);
-        }
-        std::cout << tab << "]\n";
-    }
-    std::cout << t << "},\n";
-}
-

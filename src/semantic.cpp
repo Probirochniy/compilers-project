@@ -12,5 +12,3 @@ AST::Node Semantic::analyze()
 
     return newNode;
 }
-
-

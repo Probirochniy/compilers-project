@@ -1,6 +1,7 @@
 #include "lexer.h"
 #include "parser.h"
-#include "semantic.h"
+// #include "semantic.h"
+#include "printer.h"
 
 int main(int argc, char **argv)
 {
@@ -15,10 +16,12 @@ int main(int argc, char **argv)
 
     std::list<Token> tokens = lexer.analyze();
 
-    lexer.printTokens(tokens);
+    printer::printTokens(tokens);
 
     Parser parser(tokens);
     AST::Node rootNode = parser.analyze();
+
+    printer::printAST(rootNode);
 
     // Semantic semantic(rootNode);
     // AST::Node updNode = semantic.analyze();

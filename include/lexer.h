@@ -82,8 +82,4 @@ public:
     bool isDigit(char c);
     
     bool isIdentifierOk(char c);
-
-    std::string getTokenTypeName(TokenType tokenType);
-    
-    void printTokens(std::list<Token> tokens);
 };

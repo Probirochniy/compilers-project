@@ -1,4 +1,5 @@
 #pragma once
+
 #include "lexer.h"
 
 enum class NodeType
@@ -91,6 +92,4 @@ public:
     AST::Node parseExpr();
     AST::Node parseTerm();
     AST::Node parseFactor();
-    std::string getNodeTypeName(NodeType nodetype);
-    void printAST(AST::Node node, std::string tab = "");
 };
