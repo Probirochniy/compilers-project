@@ -75,8 +75,6 @@ public:
     
     TokenType getKeyWord(std::string str);
 
-    void error(std::string keyword);
-
     bool isSpace(char c);
 
     bool isDigit(char c);

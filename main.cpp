@@ -23,8 +23,8 @@ int main(int argc, char **argv)
 
     printer::printAST(rootNode);
 
-    // Semantic semantic(rootNode);
-    // AST::Node updNode = semantic.analyze();
+    Semantic semantic(rootNode);
+    AST::Node updNode = semantic.analyze();
     
     return 0;
 }

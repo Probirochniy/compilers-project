@@ -3,11 +3,24 @@
 #include "lexer.h"
 #include "parser.h"
 
+class Variable
+{
+public:
+    std::string name;
+    TokenType type;
+
+    std::string value;
+
+
+    Variable(std::string n, TokenType t, std::string v);
+};
+
 class Semantic
 {
 public:
     AST::Node node;
-    std::list<Token> declarList;
+    std::list<Variable> declarList;
+    
 
     Semantic(AST::Node n);
 
