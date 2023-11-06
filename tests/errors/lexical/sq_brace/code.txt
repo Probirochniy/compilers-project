@@ -1,5 +1,3 @@
-var f := func f(x) is
+var f := func (x] is
     print "My favourite number: " + x;
 end
-
-f(1);

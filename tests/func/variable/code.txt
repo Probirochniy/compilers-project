@@ -1,4 +1,4 @@
-func f(x) is
+var f := func (x) is
     return x * x;
 end
 

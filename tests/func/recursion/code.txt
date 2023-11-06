@@ -1,4 +1,4 @@
-func f(x) is
+var f := func (x) is
     print x;
     if x > 0 then
         fun(x - 1);
