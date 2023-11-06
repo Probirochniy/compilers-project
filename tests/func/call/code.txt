@@ -1,0 +1,5 @@
+func f(r) is
+    print "My favourite number: " + r;
+end
+
+f(1);

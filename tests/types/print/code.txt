@@ -1,0 +1,20 @@
+var _int := 1;
+var _real := 1.1;
+var _bool := true;
+var _str := "hello";
+var notype := empty;
+var _arr := [1 , 2 , 3];
+var _tuple := {a:=0, b:= 5};
+
+func _func() is
+    print "func";
+end
+
+print _int;
+print _real;
+print _bool;
+print _str;
+print notype;
+print _arr;
+print _tuple;
+print _func();
