@@ -1,0 +1,7 @@
+func f(x) is
+    return x * x;
+end
+
+var funcVariable := f;
+
+print funcVariable(3);
