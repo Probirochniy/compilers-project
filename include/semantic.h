@@ -27,6 +27,9 @@ public:
     AST::Node analyze();
 
     void checkDeclar(AST::Node node);
-    AST::Node optimize(AST::Node node);
     void checkTypes(AST::Node node);
+    AST::Node optimize(AST::Node node);
+    void simplifyConst();
+    void removeUnused();
+    void inlineFunc();
 };
