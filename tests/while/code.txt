@@ -1,0 +1,6 @@
+var a := false;
+
+while not a loop
+    a := true;
+    print "a is true";
+end
