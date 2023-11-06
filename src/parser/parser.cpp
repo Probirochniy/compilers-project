@@ -8,6 +8,11 @@ AST::Node::Node(NodeType t) : type(t)
 {
 }
 
+AST::Node& AST::Node::operator=(AST::Node rhs) {
+    std::swap(*this, rhs);
+    return *this;
+}
+
 AST::Node::Node(NodeType t, Token v) : type(t), value(v)
 {
 }
@@ -656,20 +661,6 @@ AST::Node Parser::parseList()
 
     throw std::runtime_error("list was not closed!");
 }
-
-// AST::Node Parser::parseList()
-// {
-//     AST::Node listNode;
-//     listNode.type = NodeType::LIST;
-//     while (!curTokensList.empty())
-//     {
-//         getCurToken();
-//         AST::Node newNode(NodeType::LIST_ELEMENT, curToken);
-//         listNode.children.push_back(newNode);
-//     }
-
-//     return listNode;
-// }
 
 std::list<Token> Parser::extractList()
 {

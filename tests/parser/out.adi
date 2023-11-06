@@ -1,0 +1,39 @@
+KEYWORD |var|
+IDENTIFIER |a|
+DEFINITION |:=|
+STRING |"str"|
+DELIMITER |;|
+  {
+     "Token": {"type": "", "value": ""},
+     "Type": "PROGRAM",
+     "children": [
+        {
+           "Token": {"type": "DEFINITION", "value": ":="},
+           "Type": "DECLARATION",
+           "children": [
+              {
+                 "Token": {"type": "", "value": ""},
+                 "Type": "DECLARATION_LEFT",
+                 "children": [
+                    {
+                       "Token": {"type": "IDENTIFIER", "value": "a"},
+                       "Type": "FACTOR",
+                       "children": []
+                    },
+                 ]
+              },
+              {
+                 "Token": {"type": "", "value": ""},
+                 "Type": "DECLARATION_RIGHT",
+                 "children": [
+                    {
+                       "Token": {"type": "STRING", "value": ""str""},
+                       "Type": "FACTOR",
+                       "children": []
+                    },
+                 ]
+              },
+           ]
+        },
+     ]
+  },

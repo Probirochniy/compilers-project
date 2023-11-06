@@ -1,6 +1,21 @@
 #include "printer.h"
 
-std::string printer::getNodeTypeName(NodeType nodetype)
+Printer::Printer(){}
+Printer::Printer(std::string p) {
+    for (int i = p.size() - 1; i >= 0; i --) {
+        if(p[i] == '/') {
+            p = p.substr(0, i + 1);
+            break;
+        }
+    }
+    fout.open(p + "out.adi");
+    std::cout << p + "out.adi";
+}
+Printer::~Printer(){
+    fout.close();
+}
+
+std::string Printer::getNodeTypeName(NodeType nodetype)
 {
     std::string typeName;
 
@@ -127,7 +142,7 @@ std::string printer::getNodeTypeName(NodeType nodetype)
     return typeName;
 }
 
-std::string printer::getTokenTypeName(TokenType tokenType)
+std::string Printer::getTokenTypeName(TokenType tokenType)
 {
     std::string typeName;
 
@@ -238,34 +253,34 @@ std::string printer::getTokenTypeName(TokenType tokenType)
 }
 
 
-void printer::printTokens(std::list<Token> tokens)
+void Printer::printTokens(std::list<Token> tokens)
 {
     for (auto token : tokens)
     {
-        std::cout << printer::getTokenTypeName(token.type) << " |" << token.value << "|\n";
+        fout << Printer::getTokenTypeName(token.type) << " |" << token.value << "|\n";
     }
 }
 
-void printer::printAST(AST::Node node, std::string tab)
+void Printer::printAST(AST::Node node, std::string tab)
 {
     std::string TAB = "   ";
-    std::cout << tab << "{\n";
+    fout << tab << "{\n";
     std::string t = tab;
     tab += TAB;
-    std::cout << tab << "\"Token\": {\"type\": \"" << printer::getTokenTypeName(node.value.type) << "\", \"value\": \"" << node.value.value << "\"}," << '\n';
-    std::cout << tab << "\"Type\": \"" << getNodeTypeName(node.type) << "\",\n";
+    fout << tab << "\"Token\": {\"type\": \"" << Printer::getTokenTypeName(node.value.type) << "\", \"value\": \"" << node.value.value << "\"}," << '\n';
+    fout << tab << "\"Type\": \"" << Printer::getNodeTypeName(node.type) << "\",\n";
     if (node.children.empty())
     {
-        std::cout << tab << "\"children\": []\n";
+        fout << tab << "\"children\": []\n";
     }
     else
     {
-        std::cout << tab << "\"children\": [\n";
+        fout << tab << "\"children\": [\n";
         for (auto n : node.children)
         {
             printAST(n, tab + TAB);
         }
-        std::cout << tab << "]\n";
+        fout << tab << "]\n";
     }
-    std::cout << t << "},\n";
+    fout << t << "},\n";
 }

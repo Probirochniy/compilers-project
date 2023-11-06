@@ -11,7 +11,6 @@ public:
 
     std::string value;
 
-
     Variable(std::string n, TokenType t, std::string v);
 };
 
@@ -28,8 +27,9 @@ public:
 
     void checkDeclar(AST::Node node);
     void checkTypes(AST::Node node);
+    
     AST::Node optimize(AST::Node node);
-    void simplifyConst();
-    void removeUnused();
-    void inlineFunc();
+    AST::Node simplifyConst(AST::Node node);
+    AST::Node removeUnused(AST::Node node);
+    AST::Node inlineFunc(AST::Node node);
 };

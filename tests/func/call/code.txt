@@ -1,4 +1,4 @@
-func f(r) is
+var f := func(r) is
     print "My favourite number: " + r;
 end
 

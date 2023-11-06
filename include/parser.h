@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lexer.h"
+#include <algorithm>
 
 enum class NodeType
 {
@@ -51,6 +52,8 @@ public:
         Node(NodeType t);
 
         Node(NodeType t, Token v);
+
+        Node& operator=(Node);
     };
 
     Node node;
