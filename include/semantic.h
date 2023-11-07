@@ -24,9 +24,11 @@ public:
 
     AST::Node analyze();
 
-    void checkProgram(AST::Node node);
-    void checkDeclar(AST::Node node, std::list<Variable> &localDeclarList);
-    void checkFunc(AST::Node node, std::list<Variable> localDeclarList);
+    AST::Node checkProgram(AST::Node node);
+    AST::Node checkFor(AST::Node node, std::list<Variable> localDeclarList);
+    void checkForBody(AST::Node, std::list<Variable> &localDeclarList);
+    AST::Node checkDeclar(AST::Node node, std::list<Variable> &localDeclarList);
+    AST::Node checkFunc(AST::Node node, std::list<Variable> localDeclarList);
     void checkFuncBody(AST::Node node, std::list<Variable> &localDeclarList);
     void checkIdent(AST::Node node, std::list<Variable> localDeclarList);
 

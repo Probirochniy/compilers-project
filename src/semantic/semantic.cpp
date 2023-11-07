@@ -13,9 +13,7 @@ Variable::Variable(std::string n, TokenType t, AST::Node v)
 
 AST::Node Semantic::analyze()
 {
-    AST::Node newNode = node;
-
-    checkProgram(newNode);
+    AST::Node newNode = checkProgram(node);
 
     return newNode;
 }

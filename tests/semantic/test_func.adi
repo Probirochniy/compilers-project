@@ -1,7 +1,11 @@
 var f := func (x, y) is
     print x, y;
-    return;
+
+    var z := "baza";
+
+    return 123;
     123;
     123;
     123;
 end;
+
