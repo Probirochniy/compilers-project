@@ -41,7 +41,11 @@ enum class TokenType
     MORE,
     EXCLAMATION,
     FOLLOWING,
-    STRING
+    STRING,
+    LIST,
+    TUPLE,
+    RETURN,
+    BREAK
 };
 
 class Token

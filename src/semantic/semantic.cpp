@@ -6,7 +6,7 @@ Semantic::Semantic(AST::Node node)
 {
 }
 
-Variable::Variable(std::string n, TokenType t, std::string v)
+Variable::Variable(std::string n, TokenType t, AST::Node v)
 : name(n), type(t), value(v)
 {
 }
@@ -15,7 +15,7 @@ AST::Node Semantic::analyze()
 {
     AST::Node newNode = node;
 
-    checkDeclar(node);
+    checkProgram(newNode);
 
     return newNode;
 }

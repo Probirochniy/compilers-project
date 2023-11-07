@@ -3,7 +3,7 @@
 Printer::Printer(){}
 Printer::Printer(std::string p) {
     for (int i = p.size() - 1; i >= 0; i --) {
-        if(p[i] == '/') {
+        if(p[i] == '/' || p[i] == '\\') {
             p = p.substr(0, i + 1);
             break;
         }
@@ -138,7 +138,14 @@ std::string Printer::getNodeTypeName(NodeType nodetype)
     case NodeType::COMMENT:
         typeName = "COMMENT";
         break;
+    case NodeType::RETURN:
+        typeName = "RETURN";
+        break;
+    case NodeType::BREAK:
+        typeName = "BREAK";
+        break;
     }
+    
     return typeName;
 }
 
@@ -257,30 +264,30 @@ void Printer::printTokens(std::list<Token> tokens)
 {
     for (auto token : tokens)
     {
-        fout << Printer::getTokenTypeName(token.type) << " |" << token.value << "|\n";
+        std::cout << Printer::getTokenTypeName(token.type) << " |" << token.value << "|\n";
     }
 }
 
 void Printer::printAST(AST::Node node, std::string tab)
 {
     std::string TAB = "   ";
-    fout << tab << "{\n";
+    std::cout << tab << "{\n";
     std::string t = tab;
     tab += TAB;
-    fout << tab << "\"Token\": {\"type\": \"" << Printer::getTokenTypeName(node.value.type) << "\", \"value\": \"" << node.value.value << "\"}," << '\n';
-    fout << tab << "\"Type\": \"" << Printer::getNodeTypeName(node.type) << "\",\n";
+    std::cout << tab << "\"Token\": {\"type\": \"" << Printer::getTokenTypeName(node.value.type) << "\", \"value\": \"" << node.value.value << "\"}," << '\n';
+    std::cout << tab << "\"Type\": \"" << Printer::getNodeTypeName(node.type) << "\",\n";
     if (node.children.empty())
     {
-        fout << tab << "\"children\": []\n";
+        std::cout << tab << "\"children\": []\n";
     }
     else
     {
-        fout << tab << "\"children\": [\n";
+        std::cout << tab << "\"children\": [\n";
         for (auto n : node.children)
         {
             printAST(n, tab + TAB);
         }
-        fout << tab << "]\n";
+        std::cout << tab << "]\n";
     }
-    fout << t << "},\n";
+    std::cout << t << "},\n";
 }

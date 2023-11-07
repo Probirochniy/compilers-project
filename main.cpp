@@ -21,8 +21,10 @@ int main(int argc, char **argv)
     AST::Node rootNode = parser.analyze();
     printer.printAST(rootNode);
 
-    // Semantic semantic(rootNode);
-    // AST::Node updNode = semantic.analyze();
+    Semantic semantic(rootNode);
+    AST::Node updNode = semantic.analyze();
+
+    printer.printAST(updNode);
     
     return 0;
 }

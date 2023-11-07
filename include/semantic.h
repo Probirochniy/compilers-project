@@ -8,10 +8,9 @@ class Variable
 public:
     std::string name;
     TokenType type;
+    AST::Node value;
 
-    std::string value;
-
-    Variable(std::string n, TokenType t, std::string v);
+    Variable(std::string n, TokenType t, AST::Node v);
 };
 
 class Semantic
@@ -25,8 +24,16 @@ public:
 
     AST::Node analyze();
 
-    void checkDeclar(AST::Node node);
+    void checkProgram(AST::Node node);
+    void checkDeclar(AST::Node node, std::list<Variable> &localDeclarList);
+    void checkFunc(AST::Node node, std::list<Variable> localDeclarList);
+    void checkFuncBody(AST::Node node, std::list<Variable> &localDeclarList);
+    void checkIdent(AST::Node node, std::list<Variable> localDeclarList);
+
+
     void checkTypes(AST::Node node);
+
+
     
     AST::Node optimize(AST::Node node);
     AST::Node simplifyConst(AST::Node node);

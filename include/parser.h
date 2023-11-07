@@ -34,7 +34,9 @@ enum class NodeType
     FORLOOP_BODY,
     PRINT,
     WHILELOOP_BODY,
-    ELSE_BODY
+    ELSE_BODY,
+    RETURN,
+    BREAK
 };
 
 class AST
@@ -53,7 +55,7 @@ public:
 
         Node(NodeType t, Token v);
 
-        Node& operator=(Node);
+        // Node& operator=(Node);
     };
 
     Node node;

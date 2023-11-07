@@ -264,9 +264,10 @@ TokenType Lexer::getTokenType(char c)
 
 TokenType Lexer::getKeyWord(std::string str)
 {
-    std::string sarr[15] = {VAR_KEYWORD, IF_KEYWORD, THEN_KEYWORD, ELSE_KEYWORD, FOR_KEYWORD, END_KEYWORD,
-                            WHILE_KEYWORD, LOOP_KEYWORD, PRINT_KEYWORD, FUNC_KEYWORD, EMPTY_KEYWORD, TRUE_KEYWORD, FALSE_KEYWORD, IS_KEYWORD, IN_KEYWORD};
-    for (int i = 0; i < 15; i++)
+    std::string sarr[18] = {VAR_KEYWORD, IF_KEYWORD, THEN_KEYWORD, ELSE_KEYWORD, FOR_KEYWORD, END_KEYWORD,
+                            WHILE_KEYWORD, LOOP_KEYWORD, PRINT_KEYWORD, FUNC_KEYWORD, EMPTY_KEYWORD, TRUE_KEYWORD, 
+                            FALSE_KEYWORD, IS_KEYWORD, IN_KEYWORD , RETURN_KEYWORD, BREAK_KEYWORD , RANGE_KEYWORD };
+    for (int i = 0; i < 18; i++)
     {
         if (sarr[i] == str)
             return TokenType::KEYWORD;

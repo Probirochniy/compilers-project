@@ -1,4 +1,5 @@
 #include "parser.h"
+#include <algorithm>
 
 AST::Node::Node()
 {
@@ -8,10 +9,10 @@ AST::Node::Node(NodeType t) : type(t)
 {
 }
 
-AST::Node& AST::Node::operator=(AST::Node rhs) {
-    std::swap(*this, rhs);
-    return *this;
-}
+// AST::Node& AST::Node::operator=(AST::Node rhs) {
+//     std::swap(*this, rhs);
+//     return *this;
+// }
 
 AST::Node::Node(NodeType t, Token v) : type(t), value(v)
 {
@@ -580,7 +581,6 @@ AST::Node Parser::parseAssignment()
 
 AST::Node Parser::parseTuple()
 {
-
     Token tk = getToken();
 
     AST::Node tupleNode(NodeType::TUPLE);
@@ -590,7 +590,6 @@ AST::Node Parser::parseTuple()
 
     while (!tokens.empty())
     {
-
         // std::cout << tk.value << " " << getTokenTypeName(tk.type) << "\n";
 
         if (tk.type == TokenType::CLOSEFIGUREBRACKET)
@@ -598,14 +597,72 @@ AST::Node Parser::parseTuple()
             curTokensList = curelement;
             getCurToken();
 
-            tupleNode.children.push_back(parseExpr());
+            bool isAssignment = false;
+
+            for (auto token : curTokensList)
+            {
+                if (token.type == TokenType::DEFINITION)
+                {
+                    isAssignment = true;
+                }
+            }
+
+            if (isAssignment)
+            {
+                tokens.push_front(Token(TokenType::DELIMITER, ";"));
+
+                std::reverse(curelement.begin(), curelement.end());
+
+                for (auto token : curelement)
+                {
+                    tokens.push_front(token);
+                }
+
+                tupleNode.children.push_back(parseAssignment());
+            }
+
+            else
+            {
+                tupleNode.children.push_back(parseExpr());
+            }
+            
             return tupleNode;
         }
         else if (tk.type == TokenType::COMMA)
         {
             curTokensList = curelement;
             getCurToken();
-            tupleNode.children.push_back(parseExpr());
+
+            bool isAssignment = false;
+
+            for (auto token : curTokensList)
+            {
+                if (token.type == TokenType::DEFINITION)
+                {
+                    isAssignment = true;
+                }
+            }
+
+            if (isAssignment)
+            {
+                tokens.push_front(Token(TokenType::DELIMITER, ";"));
+
+                std::reverse(curelement.begin(), curelement.end());
+
+                for (auto token : curelement)
+                {
+                    tokens.push_front(token);
+                }
+
+                tupleNode.children.push_back(parseAssignment());
+            }
+
+            else
+            {
+                tupleNode.children.push_back(parseExpr());
+            }
+
+
             curelement = empty;
         }
 
@@ -808,6 +865,30 @@ AST::Node Parser::getNode()
     else if (tk.type == TokenType::KEYWORD && tk.value == PRINT_KEYWORD)
     {
         AST::Node printNode(NodeType::PRINT, tk);
+        while (tk.type != TokenType::DELIMITER)
+        {
+            curTokensList.push_back(tk);
+            if (tokens.empty())
+            {
+                throw std::runtime_error("Delimiter not found!");
+            }
+            tk = getToken();
+        }
+
+        getCurToken();
+
+        printNode.children.push_back(parseVarsList());
+
+        return printNode;
+    }
+
+    else if (tk.type == TokenType::KEYWORD && tk.value == BREAK_KEYWORD){
+        AST::Node breakNode(NodeType::BREAK, tk);
+        return breakNode;
+    }
+
+    else if (tk.type == TokenType::KEYWORD && tk.value == RETURN_KEYWORD){
+        AST::Node printNode(NodeType::BREAK, tk);
         while (tk.type != TokenType::DELIMITER)
         {
             curTokensList.push_back(tk);
