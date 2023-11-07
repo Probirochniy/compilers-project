@@ -29,8 +29,14 @@ public:
     void checkForBody(AST::Node, std::list<Variable> &localDeclarList);
     AST::Node checkDeclar(AST::Node node, std::list<Variable> &localDeclarList);
     AST::Node checkFunc(AST::Node node, std::list<Variable> localDeclarList);
+    AST::Node checkExpr(AST::Node node, std::list<Variable> localDeclarList);
+    AST::Node checkTerm(AST::Node node, std::list<Variable> localDeclarList);   
     void checkFuncBody(AST::Node node, std::list<Variable> &localDeclarList);
-    void checkIdent(AST::Node node, std::list<Variable> localDeclarList);
+    AST::Node checkIdent(AST::Node node, std::list<Variable> localDeclarList);
+
+    void checkIf(AST::Node node, std::list<Variable> &localDeclarList);
+
+    AST::Node checkWhile(AST::Node node, std::list<Variable> localDeclarList);
 
 
     void checkTypes(AST::Node node);

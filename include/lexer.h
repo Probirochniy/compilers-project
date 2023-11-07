@@ -45,7 +45,9 @@ enum class TokenType
     LIST,
     TUPLE,
     RETURN,
-    BREAK
+    BREAK,
+    AND,
+    OR
 };
 
 class Token

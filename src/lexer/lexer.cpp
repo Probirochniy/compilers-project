@@ -136,16 +136,21 @@ std::list<Token> Lexer::analyze()
                     token += src[i];
                     t = TokenType::LESS;
                 }
-            } else if (src[i] == '\'' || src[i] == '\"'){
+            }
+            else if (src[i] == '\'' || src[i] == '\"')
+            {
                 int j = i + 1;
-                while(j < src.size() && src[j] != src[i]) {
+                while (j < src.size() && src[j] != src[i])
+                {
                     token += src[j];
-                    j ++;
+                    j++;
                 }
                 token = src[i] + token + src[i];
                 i = j;
                 t = TokenType::STRING;
-            } else {
+            }
+            else
+            {
                 token += src[i];
                 t = getTokenType(src[i]);
             }
@@ -160,7 +165,7 @@ std::list<Token> Lexer::analyze()
             while (i < src.length() && (isDigit(src[i]) || src[i] == '.'))
             {
                 token += src[i];
-                i ++;
+                i++;
             }
 
             if (isRange(token))
@@ -171,7 +176,9 @@ std::list<Token> Lexer::analyze()
             else if (hasMoreThanOneDot(token))
             {
                 ttype = TokenType::UNKNOWNTYPE;
-            } else if (token.find('.') != std::string::npos) {
+            }
+            else if (token.find('.') != std::string::npos)
+            {
                 ttype = TokenType::REAL;
             }
 
@@ -264,10 +271,10 @@ TokenType Lexer::getTokenType(char c)
 
 TokenType Lexer::getKeyWord(std::string str)
 {
-    std::string sarr[18] = {VAR_KEYWORD, IF_KEYWORD, THEN_KEYWORD, ELSE_KEYWORD, FOR_KEYWORD, END_KEYWORD,
-                            WHILE_KEYWORD, LOOP_KEYWORD, PRINT_KEYWORD, FUNC_KEYWORD, EMPTY_KEYWORD, TRUE_KEYWORD, 
-                            FALSE_KEYWORD, IS_KEYWORD, IN_KEYWORD , RETURN_KEYWORD, BREAK_KEYWORD , RANGE_KEYWORD };
-    for (int i = 0; i < 18; i++)
+    std::string sarr[20] = {VAR_KEYWORD, IF_KEYWORD, THEN_KEYWORD, ELSE_KEYWORD, FOR_KEYWORD, END_KEYWORD,
+                            WHILE_KEYWORD, LOOP_KEYWORD, PRINT_KEYWORD, FUNC_KEYWORD, EMPTY_KEYWORD, TRUE_KEYWORD,
+                            FALSE_KEYWORD, IS_KEYWORD, IN_KEYWORD, RETURN_KEYWORD, BREAK_KEYWORD, RANGE_KEYWORD, OR_KEYWORD, AND_KEYWORD};
+    for (int i = 0; i < 20; i++)
     {
         if (sarr[i] == str)
             return TokenType::KEYWORD;

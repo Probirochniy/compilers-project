@@ -18,4 +18,5 @@ const std::string RANGE_KEYWORD = "range";
 const std::string IN_KEYWORD = "in";
 const std::string BREAK_KEYWORD = "break";
 const std::string RETURN_KEYWORD = "return";
-
+const std::string OR_KEYWORD = "or";
+const std::string AND_KEYWORD = "and";

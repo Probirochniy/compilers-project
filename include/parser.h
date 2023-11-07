@@ -97,4 +97,9 @@ public:
     AST::Node parseExpr();
     AST::Node parseTerm();
     AST::Node parseFactor();
+
+    AST::Node parseCondExpr();
+    AST::Node parseCondTerm();
+    AST::Node parseCondFactor();
+    AST::Node makeCondTree(NodeType nodetype, Token value, std::list<AST::Node> children);
 };

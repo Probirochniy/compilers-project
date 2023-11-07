@@ -234,7 +234,12 @@ AST::Node Parser::parseIf()
 
     Token token = getToken();
     std::list<Token> left;
-    while (token.value != THEN_KEYWORD)
+
+    if(token.type != TokenType::OPENBRACKET){
+        throw std::runtime_error("if condition is not correct!");
+    }
+
+    while (token.type != TokenType::CLOSEBRACKET)
     {
         left.push_back(token);
         token = getToken();
@@ -249,9 +254,11 @@ AST::Node Parser::parseIf()
 
     curTokensList = left;
 
-    AST::Node parseNode = parseCond();
+    AST::Node condNode = parseCond();
 
-    ifNode.children.push_back(parseNode);
+    //////////////////////////////////
+
+    ifNode.children.push_back(condNode);
 
     AST::Node bodyNode;
     bodyNode.type = NodeType::IF_BODY;
@@ -259,23 +266,13 @@ AST::Node Parser::parseIf()
     std::list<Token> right;
     std::list<Token> elseBody;
 
-    while (token.value != END_KEYWORD && token.value != ELSE_KEYWORD)
-    {
-        right.push_back(token);
-        token = getToken();
-    }
-
-    if (token.value == ELSE_KEYWORD)
+    while (token.value != END_KEYWORD)
     {
         token = getToken();
-        while (token.value != END_KEYWORD)
-        {
-            elseBody.push_back(token);
-            token = getToken();
+        if (token.value != END_KEYWORD){
+            right.push_back(token);
         }
     }
-
-    std::cout << token.value;
 
     if (right.empty())
     {
@@ -287,27 +284,15 @@ AST::Node Parser::parseIf()
 
     tokens = right;
 
+    for (auto tk : tokens)
+    {
+        std::cout << tk.value << "\n";
+    }
+
     bodyNode.children = parseBody();
     ifNode.children.push_back(bodyNode);
 
     tokens = tokensBackup;
-
-    if (!elseBody.empty())
-    {
-        AST::Node elseBodyNode(NodeType::ELSE_BODY, Token(TokenType::KEYWORD, ELSE_KEYWORD));
-        tokensBackup = tokens;
-
-        tokens = elseBody;
-
-        elseBodyNode.children = parseBody();
-        ifNode.children.push_back(elseBodyNode);
-
-        tokens = tokensBackup;
-    }
-
-    // for (auto t : tokens){
-    //     std::cout << t.value << " ";
-    // }
 
     return ifNode;
 }
@@ -372,82 +357,75 @@ AST::Node Parser::parseCond()
     AST::Node condNode;
     condNode.type = NodeType::IF_COND;
 
-    getCurToken();
-    std::list<Token> left;
-    while (curToken.type != TokenType::LESS && curToken.type != TokenType::MORE && curToken.type != TokenType::LESSOREQUAL && curToken.type != TokenType::MOREOREQUAL && curToken.type != TokenType::EQUALITY && curToken.type != TokenType::UNEQUALITY)
+    if (curTokensList.front().type == TokenType::OPENBRACKET)
     {
-        left.push_back(curToken);
-        getCurToken();
+        curTokensList.pop_front();
     }
 
-    if (curToken.type == TokenType::LESS)
+    if (curTokensList.back().type == TokenType::CLOSEBRACKET)
     {
-        condNode.value.value = "<";
-        condNode.value.type = TokenType::LESS;
+        curTokensList.pop_back();
     }
-    if (curToken.type == TokenType::MORE)
-    {
-        condNode.value.value = ">";
-        condNode.value.type = TokenType::MORE;
-    }
-    if (curToken.type == TokenType::MOREOREQUAL)
-    {
-        condNode.value.value = ">=";
-        condNode.value.type = TokenType::MOREOREQUAL;
-    }
-    if (curToken.type == TokenType::LESSOREQUAL)
-    {
-        condNode.value.value = "<=";
-        condNode.value.type = TokenType::LESSOREQUAL;
-    }
-    if (curToken.type == TokenType::EQUALITY)
-    {
-        condNode.value.value = "==";
-        condNode.value.type = TokenType::EQUAL;
-    }
-    if (curToken.type == TokenType::UNEQUALITY)
-    {
-        condNode.value.value = "!=";
-        condNode.value.type = TokenType::UNEQUALITY;
-    }
-
-    if (left.empty())
-    {
-        throw std::runtime_error("left condition part is empty!");
-    }
-
-    std::list<Token> curTokensBackup = curTokensList;
-
-    curTokensList = left;
-    getCurToken();
-
-    condNode.children.push_back(parseExpr());
-
-    curTokensList = curTokensBackup;
 
     getCurToken();
-    std::list<Token> right;
-
-    right.push_back(curToken);
-
-    while (getCurToken())
-    {
-        right.push_back(curToken);
-    }
-
-    if (right.empty())
-    {
-        throw std::runtime_error("right condition part is empty!");
-    }
-
-    curTokensList = right;
-    getCurToken();
-
-    condNode.children.push_back(parseExpr());
+    condNode.children.push_back(parseCondExpr());
 
     return condNode;
 }
 
+
+AST::Node Parser::parseCondExpr()
+{
+    AST::Node left = parseCondTerm();
+    while ((curToken.type == TokenType::KEYWORD && curToken.value == OR_KEYWORD) || (curToken.type == TokenType::KEYWORD && curToken.value == AND_KEYWORD))
+    {
+        Token tk = curToken;
+        getCurToken();
+        left = makeTree(NodeType::EXPRESSION, tk, {left, parseCondTerm()});
+    }
+
+    return left;
+}
+
+AST::Node Parser::parseCondTerm()
+{
+    AST::Node left = parseCondFactor();
+    while (curToken.type == TokenType::LESS || curToken.type == TokenType::MORE || curToken.type == TokenType::EQUALITY || curToken.type == TokenType::UNEQUALITY || curToken.type == TokenType::LESSOREQUAL || curToken.type == TokenType::MOREOREQUAL)
+    {
+        Token tk = curToken;
+        getCurToken();
+        left = makeTree(NodeType::TERM, tk, {left, parseCondFactor()});
+    }
+
+    return left;
+}
+
+AST::Node Parser::parseCondFactor()
+{
+    AST::Node res;
+    Token tk = curToken;
+    if (tk.type == TokenType::OPENBRACKET)
+    {
+        getCurToken(); // skip '('
+        res = parseCondExpr();
+        getCurToken(); // skip ')'
+    }
+    else
+    {
+        getCurToken();
+        res = makeCondTree(NodeType::FACTOR, tk, {});
+    }
+    return res;
+}
+
+AST::Node Parser::makeCondTree(NodeType nodetype, Token value, std::list<AST::Node> children)
+{
+    AST::Node newnode;
+    newnode.type = nodetype;
+    newnode.value = value;
+    swap(newnode.children, children);
+    return newnode;
+}
 
 
 AST::Node Parser::parseAssignment()
