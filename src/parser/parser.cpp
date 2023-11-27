@@ -149,23 +149,69 @@ AST::Node Parser::parseExprList()
 AST::Node Parser::parseVarsList()
 {
     AST::Node varsListNode;
+
     while (curTokensList.size() != 0)
     {
         getCurToken();
         AST::Node newNode;
-        newNode.type = NodeType::FACTOR;
-        newNode.value = curToken;
+        
+        if (curToken.type == TokenType::IDENTIFIER)
+        {
+            if (curTokensList.front().type == TokenType::OPENSQUAREBRACKET)
+            {
+                newNode.type = NodeType::LISTCALL;
+                newNode.value = curToken;
+
+                newNode.children.push_back(AST::Node(NodeType::IDENTIFIER, curToken));
+
+                getCurToken();
+                getCurToken();
+
+                std::list<Token> localList;
+                while (curToken.type != TokenType::CLOSESQUAREBRACKET)
+                {
+                    localList.push_back(curToken);
+                    getCurToken();
+                }
+
+                curTokensList = localList;
+
+                for (auto token : curTokensList)
+                {
+                    std::cout << token.value << " ";
+                }
+
+                getCurToken();
+
+                AST::Node indexNode = parseExpr();
+
+                newNode.children.push_back(indexNode);
+            }
+
+            else
+            {
+                newNode.type = NodeType::IDENTIFIER;
+                newNode.value = curToken;
+            }
+        }
+
+        else if (curToken.type == TokenType::STRING || curToken.type == TokenType::REAL || curToken.type == TokenType::INTEGER)
+        {
+            newNode.type = NodeType::FACTOR;
+            newNode.value = curToken;
+        }
+
         varsListNode.children.push_back(newNode);
+
+        getCurToken();
 
         if (curTokensList.size() == 0)
         {
             break;
         }
 
-        getCurToken();
-
         if (curToken.type != TokenType::COMMA)
-        {
+        {  
             throw std::runtime_error("not found ',' between variables!");
         }
     }
@@ -517,6 +563,11 @@ AST::Node Parser::parseAssignment(NodeType type)
                 assignmentRight.children.push_back(parseCondExpr());
             }
 
+            else if (tokens.front().type == TokenType::OPENSQUAREBRACKET){
+                assignmentRight.children.push_back(parseListCall(token));
+                allClosed = true;
+            }
+
             else
             {
                 throw std::runtime_error("Unknown assignment type!");
@@ -536,7 +587,6 @@ AST::Node Parser::parseAssignment(NodeType type)
 
         else if (token.type == TokenType::OPENSQUAREBRACKET)
         {
-
             // curTokensList = extractList();
 
             assignmentRight.children.push_back(parseList());
@@ -546,6 +596,11 @@ AST::Node Parser::parseAssignment(NodeType type)
         else if (token.type == TokenType::OPENFIGUREBRACKET)
         {
             assignmentRight.children.push_back(parseTuple());
+            allClosed = true;
+        }
+
+        else if (tokens.front().type == TokenType::OPENSQUAREBRACKET){
+            assignmentRight.children.push_back(parseListCall(token));
             allClosed = true;
         }
 
@@ -792,6 +847,36 @@ std::list<Token> Parser::extractFunction()
     throw std::runtime_error("Not finished function!");
 }
 
+AST::Node Parser::parseListCall(Token tk)
+{
+    std::list<Token> localList;
+
+    Token name = tk;
+
+    getToken();
+
+    while (tk.type != TokenType::CLOSESQUAREBRACKET)
+    {
+        localList.push_back(tk);
+        tk = getToken();
+    }
+
+    curTokensList = localList;
+            
+    AST::Node result = AST::Node(NodeType::LISTCALL, Token());
+
+    result.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
+
+    getCurToken();
+    getCurToken();
+
+    AST::Node indexNode = parseExpr();
+
+    result.children.push_back(indexNode);
+
+    return result;
+}
+
 AST::Node Parser::getNode()
 {
 
@@ -833,32 +918,7 @@ AST::Node Parser::getNode()
 
         if (tokens.front().type == TokenType::OPENSQUAREBRACKET)
         {
-            std::list<Token> localList;
-
-            Token name = tk;
-
-            getToken();
-
-            while (tk.type != TokenType::CLOSESQUAREBRACKET)
-            {
-                localList.push_back(tk);
-                tk = getToken();
-            }
-
-            curTokensList = localList;
-            
-            AST::Node result = AST::Node(NodeType::LISTCALL, Token());
-
-            result.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
-
-            getCurToken();
-            getCurToken();
-
-            AST::Node indexNode = parseExpr();
-
-            result.children.push_back(indexNode);
-
-            return result;
+            return parseListCall(tk);
         }
 
         if (tokens.front().type == TokenType::OPENBRACKET)

@@ -20,10 +20,17 @@ public:
     void printIRS(AST::Node node);
     void printList(AST::Node node);
     void printTuple(AST::Node node);
+    void printListCall(AST::Node node);
     void runIf(AST::Node node);
+    void runFor(AST::Node node);
+    void runWhile(AST::Node node);
     // bool isPrintable(AST::Node node);
-    
-    AST::Node evalExpr(AST::Node); // +-*/
+    AST::Node evalExpr(AST::Node node); // +-*/
     bool evalBool(AST::Node); // and or <,>,=,<=,>=,
+    AST::Node substitude(AST::Node node);
+    AST::Node operate(AST::Node oprnd1, AST::Node oprnd2, AST::Node oprtr);
+
+
+    
 
 };

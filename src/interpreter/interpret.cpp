@@ -1,9 +1,10 @@
 #include "semantic.h"
 #include "parser.h"
 #include "interpreter.h"
+#include "printer.h"
 
 void Interpreter::interpret(AST::Node node)
-{
+{   
     if (node.type == NodeType::PROGRAM)
     {
         for (auto child : node.children)
@@ -29,10 +30,33 @@ void Interpreter::interpret(AST::Node node)
             }
         }
 
-        // filled
+        // filling
         for (int i = 0; i < var_names.size(); i ++) {
             genDict[var_names[i]] = var_values[i];
         }
+    }
+
+    if (node.type == NodeType::ASSIGNMENT){
+        std::string var_name = "";
+        AST::Node var_value;
+        for (auto child : node.children){
+            if (child.type == NodeType::DECLARATION_LEFT){
+                for (auto var : child.children){
+                    var_name = var.value.value;
+                }
+            }
+            else if (child.type == NodeType::DECLARATION_RIGHT){
+                for (auto var : child.children){
+                    var_value = var;
+                }
+            }
+        }
+
+        if (var_value.type == NodeType::EXPRESSION) {
+            var_value = evalExpr(var_value);
+        }
+
+        genDict[var_name] = var_value;
     }
 
     if (node.type == NodeType::PRINT)
@@ -52,6 +76,12 @@ void Interpreter::interpret(AST::Node node)
 
     if (node.type == NodeType::IF_STATEMENT){
         runIf(node);
+    }
+    if (node.type == NodeType::FORLOOP){
+        runFor(node);
+    }
+    if (node.type == NodeType::WHILELOOP){
+        runWhile(node);
     }
 
 }

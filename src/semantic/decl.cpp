@@ -559,7 +559,7 @@ AST::Node Semantic::checkAssignment(AST::Node node, std::list<Variable> localDec
                     name = grandchild.value.value;
                     checkIdent(grandchild, localDeclarList);
 
-                    newNode.children.push_back(optimize(grandchild));
+                    newNode.children.push_back(grandchild);
                 }
                 else
                 {

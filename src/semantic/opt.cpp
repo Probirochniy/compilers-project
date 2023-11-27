@@ -64,16 +64,6 @@ AST::Node Semantic::simplifyExpr(AST::Node node)
         child2 = substitude(child2);
     }
 
-    Printer printing;
-
-    std::cout << "child1: ";
-    std::cout << std::endl;
-    printing.printAST(child1);
-    std::cout << std::endl;
-    std::cout << "child2: ";
-    printing.printAST(child2);
-    std::cout << std::endl;
-
     if (areTypesCompatible(child1.value.type, child2.value.type))
     {
         AST::Node newNode = operate(child1, child2, node);

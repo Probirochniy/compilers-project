@@ -104,6 +104,7 @@ public:
     AST::Node parseExpr();
     AST::Node parseTerm();
     AST::Node parseFactor();
+    AST::Node parseListCall(Token name);
 
     AST::Node parseCondExpr();
     AST::Node parseCondTerm();

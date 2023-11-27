@@ -1,7 +1,7 @@
 var x := [0, 1, 2 , 3];
 var ans := 0;
 
-for i in 4 loop
+for i in 0..3 loop
     ans := ans + x[i];
 end
 
@@ -9,6 +9,6 @@ print sum;
 
 var arr := ["x", "y", "z"];
 
-for i in 3 loop
+for i in 0..3 loop
     print arr[i];
 end

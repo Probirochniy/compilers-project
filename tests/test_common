@@ -1,2 +1,16 @@
-var arr1 := [1, 2, 3];
-print arr1[0];
+var a := [1, 2, 3, 4, 5];
+
+var sum1 := 0;
+var sum2 := 0;
+
+var i := 0;
+
+while (i <= 4) loop
+	sum2 := a[i];
+	sum1 := sum1 + sum2;
+	i := i + 1;
+	print sum1;
+end;
+
+print sum1;
+
