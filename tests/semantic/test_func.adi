@@ -1,11 +1,13 @@
 var f := func (x, y) is
     print x, y;
 
-    var z := "baza";
+    var z := "string";
 
     return 123;
-    123;
-    123;
-    123;
+
+    z;
+
+    234234234;
 end;
 
+f(1, 2 + 1);

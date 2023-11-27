@@ -1,0 +1,8 @@
+var a := 0;
+
+if (a <= 1)
+then 
+    print "good";
+else 
+    print "bad";
+end;

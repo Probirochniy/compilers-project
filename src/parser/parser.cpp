@@ -266,10 +266,14 @@ AST::Node Parser::parseIf()
     std::list<Token> right;
     std::list<Token> elseBody;
 
-    while (token.value != END_KEYWORD)
+    bool elseFound = false;
+
+    while (token.value != END_KEYWORD && token.value != ELSE_KEYWORD)
     {
         token = getToken();
-        if (token.value != END_KEYWORD){
+        if (token.value == ELSE_KEYWORD)
+            elseFound = true;
+        if (token.value != END_KEYWORD && token.value != ELSE_KEYWORD){
             right.push_back(token);
         }
     }
@@ -284,15 +288,38 @@ AST::Node Parser::parseIf()
 
     tokens = right;
 
-    for (auto tk : tokens)
-    {
-        std::cout << tk.value << "\n";
-    }
-
     bodyNode.children = parseBody();
     ifNode.children.push_back(bodyNode);
 
     tokens = tokensBackup;
+
+    if (elseFound){
+        token = getToken();
+        while (token.value != END_KEYWORD)
+        {
+            elseBody.push_back(token);
+            token = getToken();
+        }
+
+        if (elseBody.empty())
+        {
+            throw std::runtime_error("else body is empty!");
+        }
+
+        std::list<Token> tokensBackup;
+        tokensBackup = tokens;
+
+        tokens = elseBody;
+
+        AST::Node elseBodyNode;
+        elseBodyNode.type = NodeType::ELSE_BODY;
+        elseBodyNode.children = parseBody();
+        ifNode.children.push_back(elseBodyNode);
+
+        tokens = tokensBackup;
+    }
+
+    //////////////////////////////////
 
     return ifNode;
 }
@@ -428,10 +455,10 @@ AST::Node Parser::makeCondTree(NodeType nodetype, Token value, std::list<AST::No
 }
 
 
-AST::Node Parser::parseAssignment()
+AST::Node Parser::parseAssignment(NodeType type)
 {
     AST::Node assignmentNode;
-    assignmentNode.type = NodeType::DECLARATION;
+    assignmentNode.type = type;
 
     assignmentNode.value.value = ":=";
     assignmentNode.value.type = TokenType::DEFINITION;
@@ -484,6 +511,10 @@ AST::Node Parser::parseAssignment()
             if (curToken.type == TokenType::STRING || curToken.type == TokenType::REAL || curToken.type == TokenType::INTEGER || curToken.type == TokenType::IDENTIFIER)
             {
                 assignmentRight.children.push_back(parseExpr());
+            }
+
+            else if (curToken.type == TokenType::BOOL && (curToken.value == TRUE_KEYWORD || curToken.value == FALSE_KEYWORD)){
+                assignmentRight.children.push_back(parseCondExpr());
             }
 
             else
@@ -548,6 +579,11 @@ AST::Node Parser::parseAssignment()
         {
             assignmentRight.children.push_back(parseExpr());
         }
+
+        else if (curToken.type == TokenType::BOOL && (curToken.value == TRUE_KEYWORD || curToken.value == FALSE_KEYWORD)){
+                assignmentRight.children.push_back(parseCondExpr());
+        }
+
         else
         {
             throw std::runtime_error("Unknown assignment type!");
@@ -598,7 +634,7 @@ AST::Node Parser::parseTuple()
                     tokens.push_front(token);
                 }
 
-                tupleNode.children.push_back(parseAssignment());
+                tupleNode.children.push_back(parseAssignment(NodeType::DECLARATION));
             }
 
             else
@@ -634,7 +670,7 @@ AST::Node Parser::parseTuple()
                     tokens.push_front(token);
                 }
 
-                tupleNode.children.push_back(parseAssignment());
+                tupleNode.children.push_back(parseAssignment(NodeType::DECLARATION));
             }
 
             else
@@ -663,6 +699,7 @@ AST::Node Parser::parseList()
     Token tk = getToken();
 
     AST::Node listNode(NodeType::LIST);
+    listNode.value = Token(TokenType::LIST, "list");
 
     std::list<Token> curelement;
     std::list<Token> empty;
@@ -788,11 +825,95 @@ AST::Node Parser::getNode()
     // Expression
     if (tk.type == TokenType::STRING || tk.type == TokenType::REAL || tk.type == TokenType::INTEGER || tk.type == TokenType::IDENTIFIER || tk.type == TokenType::OPENBRACKET)
     {
-
         if (tokens.front().type == TokenType::DEFINITION)
         {
             tokens.push_front(tk);
-            return parseAssignment();
+            return parseAssignment(NodeType::ASSIGNMENT);
+        }
+
+        if (tokens.front().type == TokenType::OPENSQUAREBRACKET)
+        {
+            std::list<Token> localList;
+
+            Token name = tk;
+
+            getToken();
+
+            while (tk.type != TokenType::CLOSESQUAREBRACKET)
+            {
+                localList.push_back(tk);
+                tk = getToken();
+            }
+
+            curTokensList = localList;
+            
+            AST::Node result = AST::Node(NodeType::LISTCALL, Token());
+
+            result.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
+
+            getCurToken();
+            getCurToken();
+
+            AST::Node indexNode = parseExpr();
+
+            result.children.push_back(indexNode);
+
+            return result;
+        }
+
+        if (tokens.front().type == TokenType::OPENBRACKET)
+        {
+            std::list<Token> localList;
+
+            Token name = tk;
+
+            getToken();
+
+            AST::Node vars = AST::Node(NodeType::VARS_LIST, Token());
+
+            while (tk.type != TokenType::CLOSEBRACKET)
+            {
+                tk = getToken();
+                localList.push_back(tk);
+
+                for (auto l : localList)
+                {
+                    std::cout << l.value << " ";
+                }
+
+                std::cout << "\n";
+
+                if (tokens.front().type == TokenType::COMMA)
+                {
+                    curTokensList = localList;
+                    getCurToken();
+                    vars.children.push_back(parseExpr());
+
+                    localList.clear();
+
+                    getToken();
+                }
+
+                if (tokens.front().type == TokenType::CLOSEBRACKET)
+                {
+                    curTokensList = localList;
+                    getCurToken();
+                    vars.children.push_back(parseExpr());
+
+                    localList.clear();
+
+                    getToken();
+
+                    break;
+                }
+            }
+
+            AST::Node result = AST::Node(NodeType::FUNCTIONCALL, Token());
+
+            result.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
+            result.children.push_back(vars);
+
+            return result;
         }
 
         while (tk.type != TokenType::DELIMITER)
@@ -813,7 +934,7 @@ AST::Node Parser::getNode()
     // Assignment
     else if (tk.type == TokenType::KEYWORD && tk.value == VAR_KEYWORD)
     {
-        return parseAssignment();
+        return parseAssignment(NodeType::DECLARATION);
     }
 
     // Function
@@ -889,7 +1010,6 @@ AST::Node Parser::getNode()
     // nothing matched
     else
     {
-
         throw std::runtime_error("Statement did not match any pattern!");
     }
     return AST::Node();

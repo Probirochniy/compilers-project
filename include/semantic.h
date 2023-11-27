@@ -33,18 +33,26 @@ public:
     AST::Node checkTerm(AST::Node node, std::list<Variable> localDeclarList);   
     void checkFuncBody(AST::Node node, std::list<Variable> &localDeclarList);
     AST::Node checkIdent(AST::Node node, std::list<Variable> localDeclarList);
+    AST::Node checkAssignment(AST::Node node, std::list<Variable> localDeclarList);
+    AST::Node checkList(AST::Node node, std::list<Variable> localDeclarList);
+    AST::Node checkListCall(AST::Node node, std::list<Variable> localDeclarList);
 
-    void checkIf(AST::Node node, std::list<Variable> &localDeclarList);
+    AST::Node checkIf(AST::Node node, std::list<Variable> &localDeclarList);
 
     AST::Node checkWhile(AST::Node node, std::list<Variable> localDeclarList);
 
 
     void checkTypes(AST::Node node);
 
-
+    bool isOperator(NodeType nt);
     
     AST::Node optimize(AST::Node node);
-    AST::Node simplifyConst(AST::Node node);
+    AST::Node simplifyExpr(AST::Node node);
+    AST::Node substitude(AST::Node node);
     AST::Node removeUnused(AST::Node node);
     AST::Node inlineFunc(AST::Node node);
+    bool areTypesCompatible(TokenType lt, TokenType rt);
+
+    AST::Node operate(AST::Node oprnd1, AST::Node oprnd2, AST::Node oprtr);
+    bool areTypesNumber(TokenType lt, TokenType rt);
 };

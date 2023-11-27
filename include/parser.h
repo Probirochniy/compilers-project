@@ -36,7 +36,13 @@ enum class NodeType
     WHILELOOP_BODY,
     ELSE_BODY,
     RETURN,
-    BREAK
+    BREAK,
+    ASSIGNMENT,
+    LEFT_VALUE,
+    RIGHT_VALUE,
+    LISTCALL,
+    LISTINDEX,
+    FUNCTIONCALL
 };
 
 class AST
@@ -54,6 +60,7 @@ public:
         Node(NodeType t);
 
         Node(NodeType t, Token v);
+        Node(NodeType t, Token v, std::list<Node> c);
 
         // Node& operator=(Node);
     };
@@ -84,7 +91,7 @@ public:
     AST::Node parseIf();
     AST::Node parseWhileLoop();
     AST::Node parseCond();
-    AST::Node parseAssignment();
+    AST::Node parseAssignment(NodeType type);
     AST::Node parseTuple();
     AST::Node parseList();
     // AST::Node parseList();

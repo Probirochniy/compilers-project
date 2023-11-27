@@ -44,6 +44,7 @@ enum class TokenType
     STRING,
     LIST,
     TUPLE,
+    BOOL,
     RETURN,
     BREAK,
     AND,

@@ -144,6 +144,24 @@ std::string Printer::getNodeTypeName(NodeType nodetype)
     case NodeType::BREAK:
         typeName = "BREAK";
         break;
+    case NodeType::ASSIGNMENT:
+        typeName = "ASSIGNMENT";
+        break;
+    case NodeType::RIGHT_VALUE:
+        typeName = "RIGHT_VALUE";
+        break;
+    case NodeType::LEFT_VALUE:
+        typeName = "LEFT_VALUE";
+        break;
+    case NodeType::LISTCALL:
+        typeName = "LISTCALL";
+        break;
+    case NodeType::LISTINDEX:
+        typeName = "LISTINDEX";
+        break;
+    case NodeType::FUNCTIONCALL:
+        typeName = "FUNCTIONCALL";
+        break;
     }
     
     return typeName;
@@ -254,6 +272,16 @@ std::string Printer::getTokenTypeName(TokenType tokenType)
     case TokenType::REAL:
         typeName = "REAL";
         break;
+    case TokenType::LIST:
+        typeName = "LIST";
+        break;
+    case TokenType::TUPLE:
+        typeName = "TUPLE";
+        break;
+    case TokenType::BOOL:
+        typeName = "BOOL";
+        break;
+        
     }
 
     return typeName;

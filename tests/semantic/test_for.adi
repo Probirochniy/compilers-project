@@ -3,3 +3,5 @@ for i in 1..5 loop
     break;
     print a;
 end;
+
+i;

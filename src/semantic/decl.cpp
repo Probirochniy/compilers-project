@@ -54,12 +54,25 @@ AST::Node Semantic::checkDeclar(AST::Node node, std::list<Variable> &declarList)
             {
                 if (grandchild.value.type == TokenType::IDENTIFIER)
                 {
-                    checkIdent(grandchild, declarList);
+                    rightNode.children.push_back(optimize(checkIdent(grandchild, declarList)));
+                    valueList.push_back(optimize(grandchild));
                 }
 
                 else if (grandchild.type == NodeType::FUNCTION)
                 {
                     rightNode.children.push_back(checkFunc(grandchild, declarList));
+                    valueList.push_back(grandchild);
+                }
+
+                else if (grandchild.type == NodeType::EXPRESSION)
+                {
+                    rightNode.children.push_back(optimize(checkExpr(grandchild, declarList)));
+                    valueList.push_back(optimize(grandchild));
+                }
+
+                else if (grandchild.type == NodeType::LIST)
+                {
+                    rightNode.children.push_back(checkList(grandchild, declarList));
                     valueList.push_back(grandchild);
                 }
 
@@ -69,7 +82,7 @@ AST::Node Semantic::checkDeclar(AST::Node node, std::list<Variable> &declarList)
                     valueList.push_back(grandchild);
                 }
 
-                typeList.push_back(grandchild.value.type);
+                typeList.push_back(optimize(grandchild).value.type);
             }
 
             outputNode.children.push_back(rightNode);
@@ -83,6 +96,7 @@ AST::Node Semantic::checkDeclar(AST::Node node, std::list<Variable> &declarList)
 
     for (int i = 0; i < nameList.size(); i++)
     {
+
         declarList.push_back(Variable{nameList.front(), typeList.front(), valueList.front()});
         nameList.pop_front();
         typeList.pop_front();
@@ -90,6 +104,24 @@ AST::Node Semantic::checkDeclar(AST::Node node, std::list<Variable> &declarList)
     }
 
     return outputNode;
+}
+
+AST::Node Semantic::checkList(AST::Node node, std::list<Variable> declarList)
+{
+    AST::Node newNode = AST::Node(NodeType::LIST, Token());
+    for (auto child : node.children)
+    {
+        if (child.type == NodeType::EXPRESSION)
+        {
+            checkExpr(child, declarList);
+        }
+        if (child.type == NodeType::IDENTIFIER)
+        {
+            checkIdent(child, declarList);
+        }
+        newNode.children.push_back(optimize(child));
+    }
+    return newNode;
 }
 
 void Semantic::checkFuncBody(AST::Node node, std::list<Variable> &scopeDeclarList)
@@ -327,10 +359,55 @@ void Semantic::checkForBody(AST::Node node, std::list<Variable> &scopeDeclarList
 
 AST::Node Semantic::checkExpr(AST::Node node, std::list<Variable> declarList)
 {
-    AST::Node outputNode = AST::Node(NodeType::EXPRESSION, Token());
+    AST::Node outputNode = AST::Node(NodeType::EXPRESSION, node.value);
 
     for (auto child : node.children)
     {
+        if (child.type == NodeType::TERM)
+        {
+            outputNode.children.push_back(checkTerm(child, declarList));
+        }
+
+        else if (child.type == NodeType::EXPRESSION)
+        {
+            outputNode.children.push_back(checkExpr(child, declarList));
+        }
+
+        else if (child.value.type == TokenType::IDENTIFIER)
+        {
+            outputNode.children.push_back(checkIdent(child, declarList));
+        }
+        else
+        {
+            outputNode.children.push_back(child);
+        }
+    }
+
+    return optimize(outputNode);
+}
+
+AST::Node Semantic::checkTerm(AST::Node node, std::list<Variable> declarList)
+{
+    AST::Node outputNode = AST::Node(NodeType::TERM, node.value);
+
+    for (auto child : node.children)
+    {
+        if (child.value.type == TokenType::IDENTIFIER)
+        {
+            outputNode.children.push_back(checkIdent(child, declarList));
+            continue;
+        }
+
+        if (child.type == NodeType::EXPRESSION)
+        {
+            outputNode.children.push_back(checkExpr(child, declarList));
+        }
+
+        if (child.type == NodeType::FACTOR)
+        {
+            outputNode.children.push_back(child);
+        }
+
         if (child.type == NodeType::TERM)
         {
             outputNode.children.push_back(checkTerm(child, declarList));
@@ -340,56 +417,59 @@ AST::Node Semantic::checkExpr(AST::Node node, std::list<Variable> declarList)
     return outputNode;
 }
 
-AST::Node Semantic::checkTerm(AST::Node node, std::list<Variable> declarList)
+AST::Node Semantic::checkIf(AST::Node node, std::list<Variable> &declarList)
 {
-    AST::Node outputNode = AST::Node(NodeType::TERM, Token());
-
-    for (auto child : node.children)
-    {
-        if (child.value.type == TokenType::IDENTIFIER)
-        {
-            outputNode.children.push_back(checkIdent(child, declarList));
-        }
-    }
-
-    return outputNode;
-}
-
-void Semantic::checkIf(AST::Node node, std::list<Variable> &declarList)
-{
+    AST::Node outputNode = AST::Node(NodeType::IF_STATEMENT, node.value);
     for (auto child : node.children)
     {
         ////////////IF COND////////////
         if (child.type == NodeType::IF_COND)
         {
+            AST::Node newNode = AST::Node(NodeType::IF_COND, Token());
             for (auto grandchild : child.children)
             {
                 if (grandchild.type == NodeType::EXPRESSION)
                 {
-                    checkExpr(grandchild, declarList);
+                    newNode.children.push_back(optimize(checkExpr(grandchild, declarList)));
                 }
 
                 if (grandchild.type == NodeType::TERM)
                 {
-                    checkTerm(grandchild, declarList);
+                    newNode.children.push_back(optimize(checkTerm(grandchild, declarList)));
                 }
 
                 if (grandchild.value.type == TokenType::IDENTIFIER)
                 {
-                    checkIdent(grandchild, declarList);
+                    newNode.children.push_back(optimize(checkIdent(grandchild, declarList)));
                 }
             }
+            outputNode.children.push_back(newNode);
         }
 
         ////////////IF BODY////////////
         if (child.type == NodeType::IF_BODY)
         {
+            AST::Node newNode = AST::Node(NodeType::IF_BODY, Token());
             for (auto grandchild : child.children)
             {
+                newNode.children.push_back(checkProgram(grandchild));
                 checkProgram(grandchild);
             }
+            outputNode.children.push_back(newNode);
+        }
+
+        if (child.type == NodeType::ELSE_BODY)
+        {
+            AST::Node newNode = AST::Node(NodeType::ELSE_BODY, Token());
+            for (auto grandchild : child.children)
+            {
+                newNode.children.push_back(checkProgram(grandchild));
+                checkProgram(grandchild);
+            }
+            outputNode.children.push_back(newNode);
         }
     }
+    return outputNode;
 }
 
 AST::Node Semantic::checkWhile(AST::Node node, std::list<Variable> declarList)
@@ -452,17 +532,140 @@ AST::Node Semantic::checkWhile(AST::Node node, std::list<Variable> declarList)
             }
 
             outputNode.children.push_back(newNode);
-
-            outputNode.children.push_back(child);
         }
     }
 
     return outputNode;
 }
 
+AST::Node Semantic::checkAssignment(AST::Node node, std::list<Variable> localDeclarList)
+{
+    AST::Node outputNode = AST::Node(NodeType::ASSIGNMENT, Token());
+
+    Token newValue = Token();
+    std::string name = "";
+
+    for (auto child : node.children)
+    {
+        if (child.type == NodeType::DECLARATION_LEFT)
+        {
+
+            AST::Node newNode = AST::Node(NodeType::DECLARATION_LEFT, Token());
+
+            for (auto grandchild : child.children)
+            {
+                if (grandchild.value.type == TokenType::IDENTIFIER)
+                {
+                    name = grandchild.value.value;
+                    checkIdent(grandchild, localDeclarList);
+
+                    newNode.children.push_back(optimize(grandchild));
+                }
+                else
+                {
+                    throw std::runtime_error("Semantic error: unexpected value at assignment!");
+                }
+            }
+
+            outputNode.children.push_back(newNode);
+        }
+
+        if (child.type == NodeType::DECLARATION_RIGHT)
+        {
+            AST::Node newNode = AST::Node(NodeType::DECLARATION_RIGHT, Token());
+            for (auto grandchild : child.children)
+            {
+                if (grandchild.value.type == TokenType::IDENTIFIER)
+                {
+                    checkIdent(grandchild, localDeclarList);
+                }
+
+                else if (grandchild.type == NodeType::FUNCTION)
+                {
+                    checkFunc(grandchild, localDeclarList);
+                }
+
+                else if (grandchild.type == NodeType::EXPRESSION)
+                {
+                    checkExpr(grandchild, localDeclarList);
+                }
+
+                else
+                {
+                }
+
+                newValue = optimize(grandchild).value;
+                newNode.children.push_back(optimize(grandchild));
+            }
+
+            outputNode.children.push_back(newNode);
+        }
+    }
+
+    for (auto &var : declarList)
+    {
+        std::cout << var.name << std::endl;
+        if (var.name == name)
+        {
+            var.value = AST::Node(NodeType::EXPRESSION, newValue);
+            std::cout << "Value of " << name << " changed to " << newValue.value << std::endl;
+        }
+    }
+
+    return outputNode;
+}
+
+AST::Node Semantic::checkListCall(AST::Node node, std::list<Variable> localDeclarList)
+{
+    AST::Node newNode = AST::Node(NodeType::LISTCALL, Token());
+    std::string name = "";
+    int index = 0;
+    for (auto child : node.children)
+    {
+
+        if (child.type == NodeType::IDENTIFIER)
+        {
+            checkIdent(child, localDeclarList);
+            name = child.value.value;
+        }
+        if (child.type == NodeType::FACTOR)
+        {
+            newNode.children.push_back(child);
+            index = std::stoi(child.value.value);
+        }
+    }
+
+    for (auto var : declarList)
+    {
+        if (var.name == name)
+        {
+            if (var.value.children.size() < index)
+            {
+                throw std::runtime_error("Semantic error: index out of range!");
+            }
+
+            else
+            {
+                int i = 0;
+                for (auto element : var.value.children)
+                {
+                    if (i == index)
+                    {
+                        newNode = element;
+                    }
+                    i++;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return newNode;
+}
+
 AST::Node Semantic::checkProgram(AST::Node node)
 {
-
     ///////// DECLARATION /////////
     if (node.type == NodeType::DECLARATION)
     {
@@ -509,9 +712,9 @@ AST::Node Semantic::checkProgram(AST::Node node)
 
     if (node.type == NodeType::IF_STATEMENT)
     {
-        checkIf(node, declarList);
+        AST::Node newNode = checkIf(node, declarList);
 
-        return node;
+        return newNode;
     }
 
     if (node.type == NodeType::PRINT)
@@ -545,6 +748,8 @@ AST::Node Semantic::checkProgram(AST::Node node)
     if (node.type == NodeType::EXPRESSION)
     {
         AST::Node newNode = checkExpr(node, declarList);
+
+        newNode = optimize(newNode);
         return newNode;
     }
 
@@ -558,6 +763,22 @@ AST::Node Semantic::checkProgram(AST::Node node)
     {
         AST::Node newNode = checkWhile(node, declarList);
         return newNode;
+    }
+
+    if (node.type == NodeType::ASSIGNMENT)
+    {
+        AST::Node newNode = checkAssignment(node, declarList);
+        return newNode;
+    }
+
+    if (node.type == NodeType::LIST)
+    {
+        return checkList(node, declarList);
+    }
+
+    if (node.type == NodeType::LISTCALL)
+    {
+        return checkListCall(node, declarList);
     }
 
     return node;

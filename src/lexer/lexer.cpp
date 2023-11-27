@@ -145,7 +145,7 @@ std::list<Token> Lexer::analyze()
                     token += src[j];
                     j++;
                 }
-                token = src[i] + token + src[i];
+                
                 i = j;
                 t = TokenType::STRING;
             }
@@ -276,8 +276,13 @@ TokenType Lexer::getKeyWord(std::string str)
                             FALSE_KEYWORD, IS_KEYWORD, IN_KEYWORD, RETURN_KEYWORD, BREAK_KEYWORD, RANGE_KEYWORD, OR_KEYWORD, AND_KEYWORD};
     for (int i = 0; i < 20; i++)
     {
-        if (sarr[i] == str)
+        if (sarr[i] == str){
+            if (str == TRUE_KEYWORD || str == FALSE_KEYWORD){
+                return TokenType::BOOL;
+            }
             return TokenType::KEYWORD;
+        }
+            
     }
     return TokenType::IDENTIFIER;
 }
