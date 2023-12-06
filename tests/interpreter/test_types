@@ -6,7 +6,8 @@ var arr := [1 , 2 , 3];
 var t := {a:=0, b:= 5};
 
 var f := func(x) is
-    print "passed to function: ", x;
+    print "function is running";
+    var c := 1;
     i := i + 1;
     return x;
 end;

@@ -52,11 +52,26 @@ AST::Node Interpreter::runFunction(AST::Node node)
 
     for (auto child : funcBody.children)
     {
+
+        if (child.type == NodeType::DECLARATION){
+            for (auto gchild : child.children){
+                if (gchild.type == NodeType::DECLARATION_LEFT){
+                    for (auto var : gchild.children){
+                        funcArgs.push_back(var);
+                    }
+                }
+            }
+        }
+
         interpret(child);
         if (child.type == NodeType::BREAK && child.value.value == "return")
         {
 
-            // returning the first out of the return var list. temp.
+            for (auto arg : funcArgs){
+                genDict.erase(arg.value.value);
+            }
+
+            // returning the first out of the return var list
             for (auto returnNode : child.children)
             {
                 for (auto var : returnNode.children)
