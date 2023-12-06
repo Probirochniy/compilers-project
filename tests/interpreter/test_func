@@ -1,0 +1,13 @@
+var f := func (s, x) is
+    if (x > 2) 
+    then 
+        print "x mnogo";
+    else 
+        print "x malo";
+    end;
+
+    print "These arguments were passed to the function: ", s, x;
+    return "this was returned by the function";
+end;
+
+print f("string ", 3);

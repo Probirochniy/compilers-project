@@ -42,7 +42,9 @@ enum class NodeType
     RIGHT_VALUE,
     LISTCALL,
     LISTINDEX,
-    FUNCTIONCALL
+    FUNCTIONCALL,
+    TUPLECALL,
+    TYPECHECK
 };
 
 class AST
@@ -105,7 +107,8 @@ public:
     AST::Node parseTerm();
     AST::Node parseFactor();
     AST::Node parseListCall(Token name);
-
+    AST::Node parseFunctionCall(Token name);
+    AST::Node parseTupleCall(Token name);
     AST::Node parseCondExpr();
     AST::Node parseCondTerm();
     AST::Node parseCondFactor();

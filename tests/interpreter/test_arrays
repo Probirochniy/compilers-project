@@ -1,7 +1,11 @@
-var arr1 := [1, 2, 3];
-var arr2 := [4, 5, 6];
+var x := 1;
 
-var arr3 := arr1 + arr2;
+var arr := [x, [1, 2, 3], [1, [2, [3]]]];
 
-print arr3;
-print arr3[0];
+print arr;
+
+var b := arr[1];
+
+print b;
+
+print b[2];

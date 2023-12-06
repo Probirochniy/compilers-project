@@ -1,8 +1,0 @@
-1
-1.100000
-true
-hello
-empty
-[1, 2, 3]
-{a := 0, b := 5}
-func

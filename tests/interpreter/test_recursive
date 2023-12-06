@@ -1,0 +1,17 @@
+var f := func (x) is
+
+    if (x > 0) then
+        print f(x / 2);
+    else
+        print "konets recursii";
+    end;
+
+    return x;
+
+end;
+
+
+print f(3);
+
+f := 1;
+print f;

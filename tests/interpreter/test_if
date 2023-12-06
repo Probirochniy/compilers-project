@@ -1,8 +1,15 @@
-var a := 0;
+var a := 2;
 
-if (a <= 1)
+if (a >= 5)
 then 
-    print "good";
+    print "mnogo";
 else 
-    print "bad";
+    print "malo";
+end;
+
+if (a == 2)
+then
+    print "rovno 2";
+else
+    print "ne 2";
 end;

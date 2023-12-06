@@ -15,11 +15,22 @@ bool Interpreter::evalBool(AST::Node node) {
         }
     }
     else if (node.type == NodeType::TERM) {
-        if (evalExpr(node).value.value == "1") {
+        if (evalExpr(node).value.value == "true") {
             return true;
         }
-        else if (evalExpr(node).value.value == "0") {
+        else if (evalExpr(node).value.value == "false") {
             return false;
+        }
+    }
+    else if (node.type == NodeType::FACTOR && node.value.type == TokenType::IDENTIFIER){
+        if (genDict[node.value.value].value.value == "true") {
+            return true;
+        }
+        else if (genDict[node.value.value].value.value == "false") {
+            return false;
+        }
+        else {
+            std::runtime_error("Interpreter error: Invalid boolean value");
         }
     }
     else {

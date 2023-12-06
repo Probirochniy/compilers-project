@@ -1,5 +1,6 @@
 #include "parser.h"
 #include <algorithm>
+#include "printer.h"
 
 AST::Node::Node()
 {
@@ -8,11 +9,6 @@ AST::Node::Node()
 AST::Node::Node(NodeType t) : type(t)
 {
 }
-
-// AST::Node& AST::Node::operator=(AST::Node rhs) {
-//     std::swap(*this, rhs);
-//     return *this;
-// }
 
 AST::Node::Node(NodeType t, Token v) : type(t), value(v)
 {
@@ -154,7 +150,7 @@ AST::Node Parser::parseVarsList()
     {
         getCurToken();
         AST::Node newNode;
-        
+
         if (curToken.type == TokenType::IDENTIFIER)
         {
             if (curTokensList.front().type == TokenType::OPENSQUAREBRACKET)
@@ -176,16 +172,100 @@ AST::Node Parser::parseVarsList()
 
                 curTokensList = localList;
 
-                for (auto token : curTokensList)
-                {
-                    std::cout << token.value << " ";
-                }
-
                 getCurToken();
 
                 AST::Node indexNode = parseExpr();
 
                 newNode.children.push_back(indexNode);
+            }
+            
+            else if (curTokensList.front().type == TokenType::IDENTIFIER && curTokensList.front().value == "."){
+                newNode.type = NodeType::TUPLECALL;
+                newNode.value = curToken;
+
+                newNode.children.push_back(AST::Node(NodeType::IDENTIFIER, curToken));
+
+                getCurToken();
+                getCurToken();
+
+                AST::Node indexNode = AST::Node(NodeType::FACTOR, curToken);
+
+                newNode.children.push_back(indexNode);
+            }
+
+            else if (curTokensList.front().type == TokenType::KEYWORD && curTokensList.front().value == IS_KEYWORD)
+            {
+                newNode.type = NodeType::TYPECHECK;
+                newNode.value = curToken;
+
+                newNode.children.push_back(AST::Node(NodeType::IDENTIFIER, curToken));
+
+                getCurToken();
+                getCurToken();
+
+                AST::Node typeNode = AST::Node(NodeType::FACTOR, curToken);
+
+                newNode.children.push_back(typeNode);
+            }
+
+            else if (curTokensList.front().type == TokenType::OPENBRACKET)
+            {
+                newNode = AST::Node(NodeType::FUNCTIONCALL, Token());
+
+                std::list<Token> localList;
+
+                Token tk;
+                Token name = curToken;
+
+                getCurToken();
+
+                AST::Node vars = AST::Node(NodeType::VARS_LIST, Token());
+
+                while (tk.type != TokenType::CLOSEBRACKET)
+                {
+                    getCurToken();
+                    tk = curToken;
+                    localList.push_back(tk);
+
+                    if (curTokensList.front().type == TokenType::COMMA)
+                    {
+                        std::list<Token> backup = curTokensList;
+
+                        curTokensList = localList;
+
+                        getCurToken();
+
+                        vars.children.push_back(parseExpr());
+
+                        localList.clear();
+
+                        curTokensList = backup;
+
+                        getCurToken();
+                    }
+
+                    if (curTokensList.front().type == TokenType::CLOSEBRACKET)
+                    {
+                        std::list<Token> backup = curTokensList;
+
+                        curTokensList = localList;
+
+                        getCurToken();
+
+                        vars.children.push_back(parseExpr());
+
+                        localList.clear();
+
+                        curTokensList = backup;
+
+                        getCurToken();
+
+                        break;
+                    }
+                }
+
+                newNode.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
+                newNode.children.push_back(vars);
             }
 
             else
@@ -211,7 +291,7 @@ AST::Node Parser::parseVarsList()
         }
 
         if (curToken.type != TokenType::COMMA)
-        {  
+        {
             throw std::runtime_error("not found ',' between variables!");
         }
     }
@@ -281,7 +361,8 @@ AST::Node Parser::parseIf()
     Token token = getToken();
     std::list<Token> left;
 
-    if(token.type != TokenType::OPENBRACKET){
+    if (token.type != TokenType::OPENBRACKET)
+    {
         throw std::runtime_error("if condition is not correct!");
     }
 
@@ -319,7 +400,8 @@ AST::Node Parser::parseIf()
         token = getToken();
         if (token.value == ELSE_KEYWORD)
             elseFound = true;
-        if (token.value != END_KEYWORD && token.value != ELSE_KEYWORD){
+        if (token.value != END_KEYWORD && token.value != ELSE_KEYWORD)
+        {
             right.push_back(token);
         }
     }
@@ -339,7 +421,8 @@ AST::Node Parser::parseIf()
 
     tokens = tokensBackup;
 
-    if (elseFound){
+    if (elseFound)
+    {
         token = getToken();
         while (token.value != END_KEYWORD)
         {
@@ -446,7 +529,6 @@ AST::Node Parser::parseCond()
     return condNode;
 }
 
-
 AST::Node Parser::parseCondExpr()
 {
     AST::Node left = parseCondTerm();
@@ -500,7 +582,6 @@ AST::Node Parser::makeCondTree(NodeType nodetype, Token value, std::list<AST::No
     return newnode;
 }
 
-
 AST::Node Parser::parseAssignment(NodeType type)
 {
     AST::Node assignmentNode;
@@ -548,6 +629,7 @@ AST::Node Parser::parseAssignment(NodeType type)
 
     while (token.type != TokenType::DELIMITER)
     {
+
         if (token.type == TokenType::COMMA)
         {
             curTokensList = right;
@@ -559,13 +641,20 @@ AST::Node Parser::parseAssignment(NodeType type)
                 assignmentRight.children.push_back(parseExpr());
             }
 
-            else if (curToken.type == TokenType::BOOL && (curToken.value == TRUE_KEYWORD || curToken.value == FALSE_KEYWORD)){
+            else if (curToken.type == TokenType::BOOL && (curToken.value == TRUE_KEYWORD || curToken.value == FALSE_KEYWORD))
+            {
                 assignmentRight.children.push_back(parseCondExpr());
             }
 
-            else if (tokens.front().type == TokenType::OPENSQUAREBRACKET){
+            else if (tokens.front().type == TokenType::OPENSQUAREBRACKET)
+            {
                 assignmentRight.children.push_back(parseListCall(token));
                 allClosed = true;
+            }
+            else if (tokens.front().type == TokenType::OPENBRACKET)
+            {
+                std::cout << "HERE"
+                          << "\n";
             }
 
             else
@@ -599,10 +688,23 @@ AST::Node Parser::parseAssignment(NodeType type)
             allClosed = true;
         }
 
-        else if (tokens.front().type == TokenType::OPENSQUAREBRACKET){
+        else if (tokens.front().type == TokenType::OPENSQUAREBRACKET)
+        {
             assignmentRight.children.push_back(parseListCall(token));
             allClosed = true;
         }
+
+        else if (tokens.front().type  == TokenType::IDENTIFIER && tokens.front().value == "."){
+            assignmentRight.children.push_back(parseTupleCall(token));
+            allClosed = true;
+        }
+
+        else if (tokens.front().type == TokenType::OPENBRACKET)
+        {
+            assignmentRight.children.push_back(parseFunctionCall(token));
+            allClosed = true;
+        }
+
 
         else
         {
@@ -635,9 +737,11 @@ AST::Node Parser::parseAssignment(NodeType type)
             assignmentRight.children.push_back(parseExpr());
         }
 
-        else if (curToken.type == TokenType::BOOL && (curToken.value == TRUE_KEYWORD || curToken.value == FALSE_KEYWORD)){
-                assignmentRight.children.push_back(parseCondExpr());
+        else if (curToken.type == TokenType::BOOL && (curToken.value == TRUE_KEYWORD || curToken.value == FALSE_KEYWORD))
+        {
+            assignmentRight.children.push_back(parseCondExpr());
         }
+
 
         else
         {
@@ -655,6 +759,7 @@ AST::Node Parser::parseTuple()
     Token tk = getToken();
 
     AST::Node tupleNode(NodeType::TUPLE);
+    tupleNode.value = Token(TokenType::TUPLE, "tuple");
 
     std::list<Token> curelement;
     std::list<Token> empty;
@@ -666,38 +771,72 @@ AST::Node Parser::parseTuple()
         if (tk.type == TokenType::CLOSEFIGUREBRACKET)
         {
             curTokensList = curelement;
-            getCurToken();
 
-            bool isAssignment = false;
-
-            for (auto token : curTokensList)
-            {
-                if (token.type == TokenType::DEFINITION)
+                if (!curTokensList.empty()){
+                    getCurToken();
+    
+                bool isAssignment = false;
+    
+                for (auto token : curTokensList)
                 {
-                    isAssignment = true;
+                    if (token.type == TokenType::DEFINITION)
+                    {
+                        isAssignment = true;
+                    }
                 }
-            }
-
-            if (isAssignment)
-            {
-                tokens.push_front(Token(TokenType::DELIMITER, ";"));
-
-                std::reverse(curelement.begin(), curelement.end());
-
-                for (auto token : curelement)
+    
+                if (isAssignment)
                 {
-                    tokens.push_front(token);
+                    tokens.push_front(Token(TokenType::DELIMITER, ";"));
+    
+                    std::reverse(curelement.begin(), curelement.end());
+    
+                    for (auto token : curelement)
+                    {
+                        tokens.push_front(token);
+                    }
+    
+                    tupleNode.children.push_back(parseAssignment(NodeType::DECLARATION));
                 }
-
-                tupleNode.children.push_back(parseAssignment(NodeType::DECLARATION));
-            }
-
-            else
-            {
-                tupleNode.children.push_back(parseExpr());
+    
+                else
+                {
+                    tupleNode.children.push_back(parseExpr());
+                }
             }
             
+
             return tupleNode;
+        }
+        else if (tk.type == TokenType::OPENSQUAREBRACKET)
+        {
+            curTokensList = curelement;
+            getCurToken();
+
+            tupleNode.children.push_back(parseList());
+            curelement = empty;
+
+            // skip comma
+            if (tokens.front().type == TokenType::COMMA)
+            {
+                tk = getToken();
+            }
+
+        }
+        else if (tk.type == TokenType::OPENFIGUREBRACKET)
+        {
+            curTokensList = curelement;
+            getCurToken();
+
+            tupleNode.children.push_back(parseTuple());
+            curelement = empty;
+
+            //skip comma
+           if (tokens.front().type == TokenType::COMMA)
+            {
+                tk = getToken();
+            }
+        
         }
         else if (tk.type == TokenType::COMMA)
         {
@@ -732,7 +871,6 @@ AST::Node Parser::parseTuple()
             {
                 tupleNode.children.push_back(parseExpr());
             }
-
 
             curelement = empty;
         }
@@ -766,16 +904,51 @@ AST::Node Parser::parseList()
 
         if (tk.type == TokenType::CLOSESQUAREBRACKET)
         {
+
+            curTokensList = curelement;
+            if (!curTokensList.empty()){
+                getCurToken();
+                listNode.children.push_back(parseExpr());
+            }
+            
+
+            return listNode;
+        }
+        else if (tk.type == TokenType::OPENSQUAREBRACKET)
+        {
             curTokensList = curelement;
             getCurToken();
 
-            listNode.children.push_back(parseExpr());
-            return listNode;
+            listNode.children.push_back(parseList());
+            curelement = empty;
+
+            // skip comma
+            if (tokens.front().type == TokenType::COMMA)
+            {
+                tk = getToken();
+            }
+
+        }
+        else if (tk.type == TokenType::OPENFIGUREBRACKET)
+        {
+            curTokensList = curelement;
+            getCurToken();
+
+            listNode.children.push_back(parseTuple());
+            curelement = empty;
+
+            //skip comma
+           if (tokens.front().type == TokenType::COMMA)
+            {
+                tk = getToken();
+            }
+        
         }
         else if (tk.type == TokenType::COMMA)
         {
             curTokensList = curelement;
             getCurToken();
+
             listNode.children.push_back(parseExpr());
             curelement = empty;
         }
@@ -862,7 +1035,7 @@ AST::Node Parser::parseListCall(Token tk)
     }
 
     curTokensList = localList;
-            
+
     AST::Node result = AST::Node(NodeType::LISTCALL, Token());
 
     result.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
@@ -873,6 +1046,76 @@ AST::Node Parser::parseListCall(Token tk)
     AST::Node indexNode = parseExpr();
 
     result.children.push_back(indexNode);
+
+    return result;
+}
+
+AST::Node Parser::parseTupleCall(Token tk){
+    Token name = tk;
+
+    AST::Node result = AST::Node(NodeType::TUPLECALL, Token());
+    result.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
+
+    getToken(); // skip '.'
+
+    Token index = getToken();
+
+    result.children.push_back(AST::Node(NodeType::FACTOR, index));
+
+    return result;
+}
+
+AST::Node Parser::parseFunctionCall(Token tk)
+{
+    std::list<Token> localList;
+
+    Token name = tk;
+
+    getToken();
+
+    AST::Node vars = AST::Node(NodeType::VARS_LIST, Token());
+
+    while (tk.type != TokenType::CLOSEBRACKET)
+    {
+        tk = getToken();
+        localList.push_back(tk);
+
+        for (auto l : localList)
+        {
+            std::cout << l.value << " ";
+        }
+
+        std::cout << "\n";
+
+        if (tokens.front().type == TokenType::COMMA)
+        {
+            curTokensList = localList;
+            getCurToken();
+            vars.children.push_back(parseExpr());
+
+            localList.clear();
+
+            getToken();
+        }
+
+        if (tokens.front().type == TokenType::CLOSEBRACKET)
+        {
+            curTokensList = localList;
+            getCurToken();
+            vars.children.push_back(parseExpr());
+
+            localList.clear();
+
+            getToken();
+
+            break;
+        }
+    }
+
+    AST::Node result = AST::Node(NodeType::FUNCTIONCALL, Token());
+
+    result.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
+    result.children.push_back(vars);
 
     return result;
 }
@@ -921,59 +1164,14 @@ AST::Node Parser::getNode()
             return parseListCall(tk);
         }
 
+        if (tokens.front().type == TokenType::IDENTIFIER && tokens.front().value == ".")
+        {
+            return parseTupleCall(tk);
+        }
+
         if (tokens.front().type == TokenType::OPENBRACKET)
         {
-            std::list<Token> localList;
-
-            Token name = tk;
-
-            getToken();
-
-            AST::Node vars = AST::Node(NodeType::VARS_LIST, Token());
-
-            while (tk.type != TokenType::CLOSEBRACKET)
-            {
-                tk = getToken();
-                localList.push_back(tk);
-
-                for (auto l : localList)
-                {
-                    std::cout << l.value << " ";
-                }
-
-                std::cout << "\n";
-
-                if (tokens.front().type == TokenType::COMMA)
-                {
-                    curTokensList = localList;
-                    getCurToken();
-                    vars.children.push_back(parseExpr());
-
-                    localList.clear();
-
-                    getToken();
-                }
-
-                if (tokens.front().type == TokenType::CLOSEBRACKET)
-                {
-                    curTokensList = localList;
-                    getCurToken();
-                    vars.children.push_back(parseExpr());
-
-                    localList.clear();
-
-                    getToken();
-
-                    break;
-                }
-            }
-
-            AST::Node result = AST::Node(NodeType::FUNCTIONCALL, Token());
-
-            result.children.push_back(AST::Node(NodeType::IDENTIFIER, name));
-            result.children.push_back(vars);
-
-            return result;
+            return parseFunctionCall(tk);
         }
 
         while (tk.type != TokenType::DELIMITER)
@@ -1043,12 +1241,14 @@ AST::Node Parser::getNode()
         return printNode;
     }
 
-    else if (tk.type == TokenType::KEYWORD && tk.value == BREAK_KEYWORD){
+    else if (tk.type == TokenType::KEYWORD && tk.value == BREAK_KEYWORD)
+    {
         AST::Node breakNode(NodeType::BREAK, tk);
         return breakNode;
     }
 
-    else if (tk.type == TokenType::KEYWORD && tk.value == RETURN_KEYWORD){
+    else if (tk.type == TokenType::KEYWORD && tk.value == RETURN_KEYWORD)
+    {
         AST::Node printNode(NodeType::BREAK, tk);
         while (tk.type != TokenType::DELIMITER)
         {
@@ -1104,7 +1304,7 @@ AST::Node Parser::makeTree(NodeType nodetype, Token value, std::list<AST::Node> 
 AST::Node Parser::parseExpr()
 {
     AST::Node left = parseTerm();
-    while (curToken.type == TokenType::PLUS || curToken.type == TokenType::MINUS)
+    while (curToken.type == TokenType::PLUS || curToken.type == TokenType::MINUS )
     {
         Token tk = curToken;
         getCurToken();
@@ -1117,7 +1317,10 @@ AST::Node Parser::parseExpr()
 AST::Node Parser::parseTerm()
 {
     AST::Node left = parseFactor();
-    while (curToken.type == TokenType::MULTIPLY || curToken.type == TokenType::DIVIDE)
+    while (curToken.type == TokenType::MULTIPLY || curToken.type == TokenType::DIVIDE
+           || curToken.type == TokenType::MORE || curToken.type == TokenType::LESS
+           || curToken.type == TokenType::EQUALITY || curToken.type == TokenType::UNEQUALITY
+           || curToken.type == TokenType::LESSOREQUAL || curToken.type == TokenType::MOREOREQUAL)
     {
         Token tk = curToken;
         getCurToken();

@@ -1,0 +1,12 @@
+var tup := {15 / 36, 2, a:=321, b:=4, {1, 2, 3}};
+
+var addtup := {5, 1};
+
+addtup := addtup + tup;
+
+print addtup;
+var a := addtup.a;
+var b := a.b;
+
+print a;
+

@@ -1,5 +1,0 @@
-Semantic error
-Identifier not initialized
-19
-2
-13

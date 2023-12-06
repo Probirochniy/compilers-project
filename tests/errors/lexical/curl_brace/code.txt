@@ -1,3 +1,0 @@
-var f := func (x} is
-    print "My favourite number: " + x;
-end

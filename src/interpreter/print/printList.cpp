@@ -9,5 +9,5 @@ void Interpreter::printList(AST::Node listNode)
         printer(decs);
         std::cout << ", ";
     }
-    std::cout << "\b\b]" << std::endl;
+    std::cout << "\b\b]";
 }

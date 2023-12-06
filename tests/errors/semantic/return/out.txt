@@ -1,5 +1,0 @@
-Semantic error
-Return Statement not in Function Scopes
-0
-0
-0

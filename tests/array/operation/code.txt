@@ -1,8 +1,0 @@
-var arr := [0, "Aza", false, 100.0];
-print arr[1];
-
-arr[1] := 10;
-
-if not arr[2] then
-    print arr[0] + arr[1] + arr[3];
-end

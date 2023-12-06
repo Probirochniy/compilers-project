@@ -94,9 +94,10 @@ AST::Node Semantic::checkDeclar(AST::Node node, std::list<Variable> &declarList)
         throw std::runtime_error("Semantic error: incorrect number of variables!");
     }
 
-    for (int i = 0; i < nameList.size(); i++)
-    {
+    int size = nameList.size();
 
+    for (int i = 0; i < size; i++)
+    {
         declarList.push_back(Variable{nameList.front(), typeList.front(), valueList.front()});
         nameList.pop_front();
         typeList.pop_front();

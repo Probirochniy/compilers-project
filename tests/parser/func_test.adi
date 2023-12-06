@@ -1,3 +1,0 @@
-var myFunc := func (x, y) is
-    print x, y;
-end;

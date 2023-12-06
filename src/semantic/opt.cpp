@@ -99,13 +99,14 @@ AST::Node Semantic::substitude(AST::Node node)
 
 bool Semantic::areTypesCompatible(TokenType lt, TokenType rt)
 {
-    TokenType numx[7] = {TokenType::INTEGER, TokenType::REAL, TokenType::INTEGER, TokenType::REAL, TokenType::STRING, TokenType::BOOL, TokenType::LIST};
-    TokenType numy[7] = {TokenType::REAL, TokenType::INTEGER, TokenType::INTEGER, TokenType::REAL, TokenType::STRING, TokenType::BOOL, TokenType::LIST};
-    for (int i = 0; i < 7; i++)
+    TokenType numx[8] = {TokenType::INTEGER, TokenType::REAL, TokenType::INTEGER, TokenType::REAL, TokenType::STRING, TokenType::BOOL, TokenType::LIST, TokenType::TUPLE};
+    TokenType numy[8] = {TokenType::REAL, TokenType::INTEGER, TokenType::INTEGER, TokenType::REAL, TokenType::STRING, TokenType::BOOL, TokenType::LIST, TokenType::TUPLE};
+    for (int i = 0; i < 8; i++)
     {
         if (numx[i] == lt && numy[i] == rt)
             return true;
     }
+
 
     throw std::runtime_error("Semantic error: incompatible types");
 }
@@ -131,24 +132,41 @@ AST::Node Semantic::operate(AST::Node oprnd1, AST::Node oprnd2, AST::Node oprtr)
 
     if (isNum(oprnd1.value.type) && isNum(oprnd2.value.type))
     {
-        if (oprtr.value.type == TokenType::PLUS)
-        {
-            return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stoi(oprnd1.value.value) + stoi(oprnd2.value.value))}};
+        if(oprnd1.value.type == TokenType::INTEGER && oprnd2.value.type == TokenType::INTEGER){
+            if (oprtr.value.type == TokenType::PLUS)
+            {
+                return AST::Node{NodeType::FACTOR, Token{TokenType::INTEGER, std::to_string(stoi(oprnd1.value.value) + stoi(oprnd2.value.value))}};
+            }
+            if (oprtr.value.type == TokenType::MINUS)
+            {
+                return AST::Node{NodeType::FACTOR, Token{TokenType::INTEGER, std::to_string(stoi(oprnd1.value.value) - stoi(oprnd2.value.value))}};
+            }
+            if (oprtr.value.type == TokenType::MULTIPLY)
+            {
+                return AST::Node{NodeType::FACTOR, Token{TokenType::INTEGER, std::to_string(stoi(oprnd1.value.value) * stoi(oprnd2.value.value))}};
+            }
+            if (oprtr.value.type == TokenType::DIVIDE)
+            {
+                return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stod(oprnd1.value.value) / stod(oprnd2.value.value))}};
+            }
         }
-
-        if (oprtr.value.type == TokenType::MINUS)
-        {
-            return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stoi(oprnd1.value.value) - stoi(oprnd2.value.value))}};
-        }
-
-        if (oprtr.value.type == TokenType::MULTIPLY)
-        {
-            return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stoi(oprnd1.value.value) * stoi(oprnd2.value.value))}};
-        }
-
-        if (oprtr.value.type == TokenType::DIVIDE)
-        {
-            return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stoi(oprnd1.value.value) / stoi(oprnd2.value.value))}};
+        else {
+            if (oprtr.value.type == TokenType::PLUS)
+            {
+                return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stod(oprnd1.value.value) + stod(oprnd2.value.value))}};
+            }
+            if (oprtr.value.type == TokenType::MINUS)
+            {
+                return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stod(oprnd1.value.value) - stod(oprnd2.value.value))}};
+            }
+            if (oprtr.value.type == TokenType::MULTIPLY)
+            {
+                return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stod(oprnd1.value.value) * stod(oprnd2.value.value))}};
+            }
+            if (oprtr.value.type == TokenType::DIVIDE)
+            {
+                return AST::Node{NodeType::FACTOR, Token{TokenType::REAL, std::to_string(stod(oprnd1.value.value) / stod(oprnd2.value.value))}};
+            }
         }
 
 
@@ -183,6 +201,24 @@ AST::Node Semantic::operate(AST::Node oprnd1, AST::Node oprnd2, AST::Node oprtr)
                 newList.children.push_back(el);
             }
             return newList;
+        }
+    }
+
+
+    if (oprnd1.value.type == TokenType::TUPLE && oprnd2.value.type == TokenType::TUPLE)
+    {
+        if (oprtr.value.type == TokenType::PLUS)
+        {
+            AST::Node newTuple = AST::Node{NodeType::TUPLE, Token{TokenType::TUPLE, ""}};
+            for (auto el : oprnd1.children)
+            {
+                newTuple.children.push_back(el);
+            }
+            for (auto el : oprnd2.children)
+            {
+                newTuple.children.push_back(el);
+            }
+            return newTuple;
         }
     }
 

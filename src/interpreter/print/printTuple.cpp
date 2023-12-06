@@ -6,5 +6,5 @@ void Interpreter::printTuple(AST::Node tupleNode){
         printer(decs);
         std::cout << ", ";
     }
-    std::cout << "\b\b}" << std::endl;
+    std::cout << "\b\b}";
 }   

@@ -162,6 +162,12 @@ std::string Printer::getNodeTypeName(NodeType nodetype)
     case NodeType::FUNCTIONCALL:
         typeName = "FUNCTIONCALL";
         break;
+    case NodeType::TUPLECALL:
+        typeName = "TUPLECALL";
+        break;
+    case NodeType::TYPECHECK:
+        typeName = "TYPECHECK";
+        break;
     }
     
     return typeName;

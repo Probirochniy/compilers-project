@@ -51,9 +51,22 @@ void Interpreter::printer(AST::Node node)
         printListCall(node);
     }
 
-    else if (node.type == NodeType::EXPRESSION){
+    else if (node.type == NodeType::TUPLECALL){
+        printTupleCall(node);
+    }
+    else if (node.type == NodeType::TYPECHECK){
+        printTypeCheck(node);
+    }
+
+    else if (node.type == NodeType::EXPRESSION || node.type == NodeType::TERM){
         
         std::cout << evalExpr(node).value.value;
+    }
+
+    else if (node.type == NodeType::FUNCTIONCALL){
+        std::map<std::string, AST::Node> genDictBackup = genDict;
+        std::cout << runFunction(node).value.value;
+        genDict = genDictBackup;
     }
 
     else

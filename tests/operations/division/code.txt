@@ -1,9 +1,0 @@
-var int_int_div := 10 / 2;
-var int_real_div := 10 / 2.5;
-var real_int_div := 10.5 / 2;
-var real_real_div := 10.0 / 2.5;
-
-print int_int_div;
-print int_real_div;
-print real_int_div;
-print real_real_div;
