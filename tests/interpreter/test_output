@@ -1,0 +1,13 @@
+var a := 1;
+var b := 2;
+
+var c := a / b;
+
+var h := "Hello, ";
+var w := "world";
+
+var hw := h + w;
+
+print c;
+print 123;
+print hw;

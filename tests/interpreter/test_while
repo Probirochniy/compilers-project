@@ -1,0 +1,12 @@
+var a := ["element 1", "element 2", "element 3"];
+var i := 0;
+
+var f := func (x) is
+	x := x + 1;
+	return x;
+end;	
+
+while (i <= 4) loop
+	print a[i];
+	i := f(i);
+end;
