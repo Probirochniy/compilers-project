@@ -110,9 +110,7 @@ void Interpreter::interpret(AST::Node node)
     }
 
     if (node.type == NodeType::FUNCTIONCALL){
-        std::map<std::string, AST::Node> genDictBackup = genDict;
         runFunction(node);
-        genDict = genDictBackup;
     }
 
 }
